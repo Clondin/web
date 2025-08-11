@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flowchart Project Manager</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <h1>Flowchart Project Manager</h1>
+  <form id="task-form">
+    <input type="text" id="task-name" placeholder="Task name" required>
+    <select id="task-dependency">
+      <option value="">No dependency</option>
+    </select>
+    <button type="submit">Add Task</button>
+  </form>
+  <div id="chart">
+    <div class="mermaid" id="mermaid-diagram"></div>
+  </div>
+  <script>
+    mermaid.initialize({ startOnLoad: false });
+  </script>
+</body>
+</html>
