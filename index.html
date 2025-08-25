@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Notes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <header class="sidebar__header">
+                <h1>Notes</h1>
+                <div class="actions">
+                    <button id="new-note" class="btn" title="New (Ctrl+N)">New</button>
+                    <button id="export-notes" class="btn" title="Export notes">Export</button>
+                    <label id="import-notes-label" class="btn" for="import-file" title="Import notes">Import</label>
+                    <input id="import-file" type="file" accept="application/json" hidden>
+                    <button id="toggle-theme" class="btn" title="Toggle theme">Theme</button>
+                </div>
+            </header>
+            <div class="sidebar__search">
+                <input id="search" type="search" placeholder="Search notes…" aria-label="Search notes">
+            </div>
+            <ul id="notes-list" class="notes-list" aria-label="Notes list"></ul>
+        </aside>
+        <main class="editor">
+            <input id="note-title" class="editor__title" type="text" placeholder="Title" aria-label="Note title">
+            <textarea id="note-body" class="editor__body" placeholder="Start typing…" aria-label="Note body"></textarea>
+            <div class="editor__actions">
+                <button id="pin-note" class="btn" aria-pressed="false" title="Pin note">Pin</button>
+                <button id="save-note" class="btn primary">Save</button>
+                <button id="delete-note" class="btn danger">Delete</button>
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+    
+</body>
+</html>
+
