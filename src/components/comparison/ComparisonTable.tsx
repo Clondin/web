@@ -1,7 +1,7 @@
 'use client';
 
 import { HealthPlan, CostBreakdown } from '@/types';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatCopay } from '@/lib/utils';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 interface ComparisonTableProps {
@@ -185,7 +185,7 @@ export default function ComparisonTable({
                   plan.id === lowestCostId ? 'bg-green-50' : ''
                 }`}
               >
-                {formatCurrency(plan.copays.pcp)}
+                {formatCopay(plan.copays.pcp)}
               </td>
             ))}
           </tr>
@@ -198,7 +198,7 @@ export default function ComparisonTable({
                   plan.id === lowestCostId ? 'bg-green-50' : ''
                 }`}
               >
-                {formatCurrency(plan.copays.specialist)}
+                {formatCopay(plan.copays.specialist)}
               </td>
             ))}
           </tr>
@@ -211,7 +211,7 @@ export default function ComparisonTable({
                   plan.id === lowestCostId ? 'bg-green-50' : ''
                 }`}
               >
-                {formatCurrency(plan.copays.urgentCare)}
+                {formatCopay(plan.copays.urgentCare)}
               </td>
             ))}
           </tr>
@@ -224,7 +224,7 @@ export default function ComparisonTable({
                   plan.id === lowestCostId ? 'bg-green-50' : ''
                 }`}
               >
-                {formatCurrency(plan.copays.er)}
+                {formatCopay(plan.copays.er)}
               </td>
             ))}
           </tr>
@@ -237,7 +237,7 @@ export default function ComparisonTable({
                   plan.id === lowestCostId ? 'bg-green-50' : ''
                 }`}
               >
-                {formatCurrency(plan.copays.imaging)}
+                {formatCopay(plan.copays.imaging)}
               </td>
             ))}
           </tr>
@@ -250,7 +250,7 @@ export default function ComparisonTable({
                   plan.id === lowestCostId ? 'bg-green-50' : ''
                 }`}
               >
-                {formatCurrency(plan.copays.labs)}
+                {formatCopay(plan.copays.labs)}
               </td>
             ))}
           </tr>
@@ -262,24 +262,26 @@ export default function ComparisonTable({
             </td>
           </tr>
           <tr>
-            <td className="p-3 border-b text-gray-600">Rx Deductible Applies</td>
+            <td className="p-3 border-b text-gray-600">Rx Deductible</td>
             {plans.map((plan) => (
               <td
                 key={plan.id}
-                className={`p-3 border-b text-center ${
+                className={`p-3 border-b text-center font-medium ${
                   plan.id === lowestCostId ? 'bg-green-50' : ''
                 }`}
               >
-                {plan.rxDeductibleApplies ? (
-                  <span className="text-orange-600 font-medium">Yes</span>
+                {plan.rxTiers.deductible === 'medical' ? (
+                  <span className="text-orange-600">Medical</span>
+                ) : typeof plan.rxTiers.deductible === 'number' && plan.rxTiers.deductible > 0 ? (
+                  formatCurrency(plan.rxTiers.deductible)
                 ) : (
-                  <span className="text-green-600 font-medium">No</span>
+                  <span className="text-green-600">None</span>
                 )}
               </td>
             ))}
           </tr>
           <tr>
-            <td className="p-3 border-b text-gray-600">Generic</td>
+            <td className="p-3 border-b text-gray-600">Tier 1 (Generic)</td>
             {plans.map((plan) => (
               <td
                 key={plan.id}
@@ -287,12 +289,12 @@ export default function ComparisonTable({
                   plan.id === lowestCostId ? 'bg-green-50' : ''
                 }`}
               >
-                {formatCurrency(plan.rxTiers.generic)}
+                {formatCurrency(plan.rxTiers.tier1)}
               </td>
             ))}
           </tr>
           <tr>
-            <td className="p-3 border-b text-gray-600">Preferred Brand</td>
+            <td className="p-3 border-b text-gray-600">Tier 2 (Preferred)</td>
             {plans.map((plan) => (
               <td
                 key={plan.id}
@@ -300,12 +302,12 @@ export default function ComparisonTable({
                   plan.id === lowestCostId ? 'bg-green-50' : ''
                 }`}
               >
-                {formatCurrency(plan.rxTiers.preferred)}
+                {formatCurrency(plan.rxTiers.tier2)}
               </td>
             ))}
           </tr>
           <tr>
-            <td className="p-3 border-b text-gray-600">Specialty</td>
+            <td className="p-3 border-b text-gray-600">Tier 3 (Specialty)</td>
             {plans.map((plan) => (
               <td
                 key={plan.id}
@@ -313,7 +315,7 @@ export default function ComparisonTable({
                   plan.id === lowestCostId ? 'bg-green-50' : ''
                 }`}
               >
-                {formatCurrency(plan.rxTiers.specialty)}
+                {formatCurrency(plan.rxTiers.tier3)}
               </td>
             ))}
           </tr>

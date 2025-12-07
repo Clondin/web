@@ -4,8 +4,10 @@ import { CostBreakdown, HealthPlan } from '@/types';
 import { formatCurrency } from '@/lib/utils';
 import {
   CheckCircleIcon,
-  ExclamationCircleIcon,
+  ExclamationTriangleIcon,
+  ArrowTrendingDownIcon,
 } from '@heroicons/react/24/solid';
+import { StarIcon } from '@heroicons/react/24/solid';
 
 interface CostBreakdownCardProps {
   breakdown: CostBreakdown;
@@ -30,37 +32,44 @@ export default function CostBreakdownCard({
     100
   );
 
+  const getRankStyles = (rank: number) => {
+    switch (rank) {
+      case 1:
+        return 'bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30';
+      case 2:
+        return 'bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/30';
+      case 3:
+        return 'bg-gradient-to-br from-violet-500 to-purple-500 text-white shadow-lg shadow-violet-500/30';
+      default:
+        return 'bg-slate-100 text-slate-600';
+    }
+  };
+
   return (
     <div
-      className={`bg-white rounded-xl shadow-sm border-2 ${
-        isLowestCost ? 'border-green-500 ring-2 ring-green-100' : 'border-gray-200'
+      className={`bg-white rounded-2xl shadow-sm border-2 transition-all duration-300 hover:shadow-lg ${
+        isLowestCost ? 'border-emerald-500 ring-4 ring-emerald-100' : 'border-slate-200'
       }`}
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-100">
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="flex items-center space-x-2">
-              {rank && (
-                <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                    rank === 1
-                      ? 'bg-green-100 text-green-700'
-                      : rank === 2
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  #{rank}
-                </span>
-              )}
-              <h3 className="font-semibold text-gray-900">{breakdown.planName}</h3>
+      <div className="p-5 border-b border-slate-100">
+        <div className="flex justify-between items-start gap-3">
+          <div className="flex items-start gap-3">
+            {rank && (
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold ${getRankStyles(rank)}`}
+              >
+                #{rank}
+              </div>
+            )}
+            <div>
+              <h3 className="font-bold text-lg text-slate-900">{breakdown.planName}</h3>
+              <p className="text-sm text-slate-500">{plan.carrier} &bull; {plan.networkType}</p>
             </div>
-            <p className="text-sm text-gray-500 mt-1">{plan.carrier}</p>
           </div>
           {isLowestCost && (
-            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full flex items-center">
-              <CheckCircleIcon className="h-3 w-3 mr-1" />
+            <span className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold rounded-full flex items-center gap-1 shadow-lg shadow-emerald-500/30">
+              <StarIcon className="h-3 w-3" />
               Best Value
             </span>
           )}
@@ -68,57 +77,51 @@ export default function CostBreakdownCard({
       </div>
 
       {/* Cost Summary */}
-      <div className="p-4 bg-gray-50">
+      <div className="p-5 bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="text-center">
-          <p className="text-sm text-gray-600">Estimated Annual Cost</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">
+          <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">Estimated Annual Cost</p>
+          <p className="text-4xl font-bold text-slate-900 mt-2">
             {formatCurrency(breakdown.netAnnualCost)}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-slate-500 mt-1.5">
             After tax savings & HRA credit
           </p>
         </div>
       </div>
 
       {/* Detailed Breakdown */}
-      <div className="p-4 space-y-4">
+      <div className="p-5 space-y-4">
         {/* Premium */}
-        <div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Annual Premiums</span>
-            <span className="font-medium">{formatCurrency(breakdown.annualPremium)}</span>
-          </div>
+        <div className="flex justify-between items-center py-2 border-b border-slate-100">
+          <span className="text-sm font-medium text-slate-600">Annual Premiums</span>
+          <span className="font-semibold text-slate-900">{formatCurrency(breakdown.annualPremium)}</span>
         </div>
 
         {/* Medical Costs */}
         <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Medical Expenses</span>
-            <span className="font-medium">{formatCurrency(breakdown.totalMedicalCosts)}</span>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-slate-600">Medical Expenses</span>
+            <span className="font-semibold text-slate-900">{formatCurrency(breakdown.totalMedicalCosts)}</span>
           </div>
-          <div className="pl-4 space-y-1 text-xs text-gray-500">
-            <div className="flex justify-between">
-              <span>PCP Visits</span>
-              <span>{formatCurrency(breakdown.medicalCosts.pcpCosts)}</span>
+          <div className="pl-4 grid grid-cols-2 gap-x-4 gap-y-1.5">
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-500">PCP</span>
+              <span className="text-slate-700 font-medium">{formatCurrency(breakdown.medicalCosts.pcpCosts)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>Specialist Visits</span>
-              <span>{formatCurrency(breakdown.medicalCosts.specialistCosts)}</span>
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-500">Specialist</span>
+              <span className="text-slate-700 font-medium">{formatCurrency(breakdown.medicalCosts.specialistCosts)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>Labs & Imaging</span>
-              <span>
-                {formatCurrency(
-                  breakdown.medicalCosts.labCosts + breakdown.medicalCosts.imagingCosts
-                )}
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-500">Labs/Imaging</span>
+              <span className="text-slate-700 font-medium">
+                {formatCurrency(breakdown.medicalCosts.labCosts + breakdown.medicalCosts.imagingCosts)}
               </span>
             </div>
-            <div className="flex justify-between">
-              <span>ER & Urgent Care</span>
-              <span>
-                {formatCurrency(
-                  breakdown.medicalCosts.erCosts + breakdown.medicalCosts.urgentCareCosts
-                )}
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-500">ER/Urgent</span>
+              <span className="text-slate-700 font-medium">
+                {formatCurrency(breakdown.medicalCosts.erCosts + breakdown.medicalCosts.urgentCareCosts)}
               </span>
             </div>
           </div>
@@ -126,81 +129,86 @@ export default function CostBreakdownCard({
 
         {/* Rx Costs */}
         <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Prescription Costs</span>
-            <span className="font-medium">{formatCurrency(breakdown.rxCosts.totalRxCosts)}</span>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-slate-600">Prescription Costs</span>
+            <span className="font-semibold text-slate-900">{formatCurrency(breakdown.rxCosts.totalRxCosts)}</span>
           </div>
-          <div className="pl-4 space-y-1 text-xs text-gray-500">
-            <div className="flex justify-between">
-              <span>Generic</span>
-              <span>{formatCurrency(breakdown.rxCosts.genericCosts)}</span>
+          <div className="pl-4 grid grid-cols-3 gap-x-4 gap-y-1.5">
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-500">Generic</span>
+              <span className="text-slate-700 font-medium">{formatCurrency(breakdown.rxCosts.genericCosts)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>Brand</span>
-              <span>{formatCurrency(breakdown.rxCosts.brandCosts)}</span>
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-500">Brand</span>
+              <span className="text-slate-700 font-medium">{formatCurrency(breakdown.rxCosts.brandCosts)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>Specialty</span>
-              <span>{formatCurrency(breakdown.rxCosts.specialtyCosts)}</span>
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-500">Specialty</span>
+              <span className="text-slate-700 font-medium">{formatCurrency(breakdown.rxCosts.specialtyCosts)}</span>
             </div>
           </div>
         </div>
 
         {/* Subtotal */}
-        <div className="pt-2 border-t border-gray-200">
-          <div className="flex justify-between text-sm font-medium">
-            <span className="text-gray-700">Total Before Adjustments</span>
-            <span>{formatCurrency(breakdown.totalAnnualCost)}</span>
+        <div className="pt-3 border-t border-slate-200">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-semibold text-slate-700">Total Before Adjustments</span>
+            <span className="font-bold text-slate-900">{formatCurrency(breakdown.totalAnnualCost)}</span>
           </div>
         </div>
 
         {/* Savings */}
         {(breakdown.totalTaxSavings > 0 || breakdown.hraCredit > 0) && (
-          <div className="space-y-2">
+          <div className="bg-emerald-50 rounded-xl p-3 space-y-2">
+            <div className="flex items-center gap-2 text-emerald-700 text-sm font-semibold">
+              <ArrowTrendingDownIcon className="h-4 w-4" />
+              Savings & Credits
+            </div>
             {breakdown.hraCredit > 0 && (
-              <div className="flex justify-between text-sm text-green-600">
-                <span>HRA Credit</span>
-                <span>-{formatCurrency(breakdown.hraCredit)}</span>
+              <div className="flex justify-between text-sm">
+                <span className="text-emerald-600">HRA Credit</span>
+                <span className="font-semibold text-emerald-700">-{formatCurrency(breakdown.hraCredit)}</span>
               </div>
             )}
             {breakdown.hsaTaxSavings > 0 && (
-              <div className="flex justify-between text-sm text-green-600">
-                <span>HSA Tax Savings</span>
-                <span>-{formatCurrency(breakdown.hsaTaxSavings)}</span>
+              <div className="flex justify-between text-sm">
+                <span className="text-emerald-600">HSA Tax Savings</span>
+                <span className="font-semibold text-emerald-700">-{formatCurrency(breakdown.hsaTaxSavings)}</span>
               </div>
             )}
             {breakdown.fsaMedicalTaxSavings > 0 && (
-              <div className="flex justify-between text-sm text-green-600">
-                <span>FSA Tax Savings</span>
-                <span>-{formatCurrency(breakdown.fsaMedicalTaxSavings)}</span>
+              <div className="flex justify-between text-sm">
+                <span className="text-emerald-600">FSA Tax Savings</span>
+                <span className="font-semibold text-emerald-700">-{formatCurrency(breakdown.fsaMedicalTaxSavings)}</span>
               </div>
             )}
             {breakdown.fsaDependentCareTaxSavings > 0 && (
-              <div className="flex justify-between text-sm text-green-600">
-                <span>Dependent Care FSA Savings</span>
-                <span>-{formatCurrency(breakdown.fsaDependentCareTaxSavings)}</span>
+              <div className="flex justify-between text-sm">
+                <span className="text-emerald-600">Dependent Care FSA</span>
+                <span className="font-semibold text-emerald-700">-{formatCurrency(breakdown.fsaDependentCareTaxSavings)}</span>
               </div>
             )}
           </div>
         )}
 
-        {/* Deductible Progress */}
-        <div className="pt-3 space-y-3">
+        {/* Progress Bars */}
+        <div className="pt-3 space-y-4">
           <div>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-600">Deductible</span>
-              <span className="text-gray-900">
-                {formatCurrency(breakdown.deductibleSpend)} of{' '}
-                {formatCurrency(plan.deductible.single)}
+            <div className="flex justify-between text-xs mb-2">
+              <span className="font-medium text-slate-600">Deductible</span>
+              <span className="font-semibold text-slate-900">
+                {formatCurrency(breakdown.deductibleSpend)} of {formatCurrency(plan.deductible.single)}
                 {breakdown.deductibleMet && (
-                  <CheckCircleIcon className="inline h-3 w-3 text-green-500 ml-1" />
+                  <CheckCircleIcon className="inline h-4 w-4 text-emerald-500 ml-1" />
                 )}
               </span>
             </div>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className={`h-full transition-all ${
-                  breakdown.deductibleMet ? 'bg-green-500' : 'bg-blue-500'
+                className={`h-full rounded-full transition-all duration-500 ${
+                  breakdown.deductibleMet
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500'
+                    : 'bg-gradient-to-r from-blue-500 to-indigo-500'
                 }`}
                 style={{ width: `${deductibleProgress}%` }}
               />
@@ -208,20 +216,21 @@ export default function CostBreakdownCard({
           </div>
 
           <div>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-600">Out-of-Pocket Max</span>
-              <span className="text-gray-900">
-                {formatCurrency(breakdown.oopMaxSpend)} of{' '}
-                {formatCurrency(plan.oopMax.single)}
+            <div className="flex justify-between text-xs mb-2">
+              <span className="font-medium text-slate-600">Out-of-Pocket Max</span>
+              <span className="font-semibold text-slate-900">
+                {formatCurrency(breakdown.oopMaxSpend)} of {formatCurrency(plan.oopMax.single)}
                 {breakdown.oopMaxMet && (
-                  <ExclamationCircleIcon className="inline h-3 w-3 text-orange-500 ml-1" />
+                  <ExclamationTriangleIcon className="inline h-4 w-4 text-amber-500 ml-1" />
                 )}
               </span>
             </div>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className={`h-full transition-all ${
-                  breakdown.oopMaxMet ? 'bg-orange-500' : 'bg-blue-500'
+                className={`h-full rounded-full transition-all duration-500 ${
+                  breakdown.oopMaxMet
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500'
+                    : 'bg-gradient-to-r from-blue-500 to-indigo-500'
                 }`}
                 style={{ width: `${oopProgress}%` }}
               />

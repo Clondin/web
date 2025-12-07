@@ -28,11 +28,26 @@ export function classNames(...classes: (string | boolean | undefined | null)[]):
 export function getEnrollmentLabel(type: string): string {
   const labels: Record<string, string> = {
     single: 'Single',
-    employeeSpouse: 'Employee + Spouse',
-    employeeChildren: 'Employee + Children',
+    couple: 'Employee + Spouse',
+    employeeChild: 'Employee + Child(ren)',
     family: 'Family',
   };
   return labels[type] || type;
+}
+
+export function getIncomeTierLabel(tier: string): string {
+  const labels: Record<string, string> = {
+    standard: 'Under $200k',
+    high: '$200k+',
+  };
+  return labels[tier] || tier;
+}
+
+export function formatCopay(copay: number | string): string {
+  if (typeof copay === 'number') {
+    return formatCurrency(copay);
+  }
+  return copay;
 }
 
 export function slugify(text: string): string {

@@ -9,10 +9,6 @@ function formatCurrency(value: number): string {
   }).format(value);
 }
 
-function formatPercentage(value: number): string {
-  return `${value}%`;
-}
-
 function determineChangeType(
   oldValue: number | string | undefined,
   newValue: number | string | undefined
@@ -31,6 +27,25 @@ function calculatePercentChange(oldValue: number, newValue: number): number {
   return Math.round(((newValue - oldValue) / oldValue) * 100);
 }
 
+function determineImpact(
+  category: YearOverYearChange['category'],
+  changeType: 'increase' | 'decrease' | 'same' | 'new' | 'removed'
+): 'positive' | 'negative' | 'neutral' {
+  if (changeType === 'same') return 'neutral';
+
+  // For costs (premium, deductible, copay, rx), increase is bad, decrease is good
+  if (['premium', 'deductible', 'copay', 'rx'].includes(category)) {
+    return changeType === 'decrease' ? 'positive' : 'negative';
+  }
+
+  // For benefits, increase is good, decrease is bad
+  if (category === 'benefits') {
+    return changeType === 'increase' ? 'positive' : 'negative';
+  }
+
+  return 'neutral';
+}
+
 export function compareYearOverYear(plan2025?: HealthPlan, plan2026?: HealthPlan): PlanYearComparison {
   const changes: YearOverYearChange[] = [];
 
@@ -45,9 +60,11 @@ export function compareYearOverYear(plan2025?: HealthPlan, plan2026?: HealthPlan
         {
           field: 'plan',
           displayName: 'Plan Status',
+          category: 'benefits',
           oldValue: 'N/A',
           newValue: 'New Plan',
           changeType: 'new',
+          impact: 'neutral',
         },
       ],
       summary: `${plan2026!.name} is a new plan for 2026.`,
@@ -61,9 +78,11 @@ export function compareYearOverYear(plan2025?: HealthPlan, plan2026?: HealthPlan
         {
           field: 'plan',
           displayName: 'Plan Status',
+          category: 'benefits',
           oldValue: plan2025.name,
           newValue: 'Discontinued',
           changeType: 'removed',
+          impact: 'neutral',
         },
       ],
       summary: `${plan2025.name} has been discontinued for 2026.`,
@@ -75,9 +94,11 @@ export function compareYearOverYear(plan2025?: HealthPlan, plan2026?: HealthPlan
     changes.push({
       field: 'carrier',
       displayName: 'Insurance Carrier',
+      category: 'network',
       oldValue: plan2025.carrier,
       newValue: plan2026.carrier,
       changeType: 'same',
+      impact: 'neutral',
     });
   }
 
@@ -85,194 +106,168 @@ export function compareYearOverYear(plan2025?: HealthPlan, plan2026?: HealthPlan
     changes.push({
       field: 'network',
       displayName: 'Network',
+      category: 'network',
       oldValue: plan2025.network,
       newValue: plan2026.network,
       changeType: 'same',
+      impact: 'neutral',
     });
   }
 
   // Compare premiums
-  const premiumFields: (keyof HealthPlan['premiums'])[] = ['single', 'employeeSpouse', 'employeeChildren', 'family'];
-  for (const field of premiumFields) {
-    const oldVal = plan2025.premiums[field];
-    const newVal = plan2026.premiums[field];
+  const premiumFields: { key: keyof HealthPlan['premiums']; label: string }[] = [
+    { key: 'single', label: 'Single' },
+    { key: 'couple', label: 'Employee + Spouse' },
+    { key: 'employeeChild', label: 'Employee + Child' },
+    { key: 'family', label: 'Family' },
+  ];
+
+  for (const { key, label } of premiumFields) {
+    const oldVal = plan2025.premiums[key];
+    const newVal = plan2026.premiums[key];
     if (oldVal !== newVal) {
+      const changeType = determineChangeType(oldVal, newVal);
       changes.push({
-        field: `premium_${field}`,
-        displayName: `Weekly Premium (${field === 'employeeSpouse' ? 'Employee + Spouse' : field === 'employeeChildren' ? 'Employee + Children' : field.charAt(0).toUpperCase() + field.slice(1)})`,
+        field: `premium_${key}`,
+        displayName: `Weekly Premium (${label})`,
+        category: 'premium',
         oldValue: formatCurrency(oldVal),
         newValue: formatCurrency(newVal),
-        changeType: determineChangeType(oldVal, newVal),
+        changeType,
         percentChange: calculatePercentChange(oldVal, newVal),
+        impact: determineImpact('premium', changeType),
       });
     }
   }
 
   // Compare deductibles
   if (plan2025.deductible.single !== plan2026.deductible.single) {
+    const changeType = determineChangeType(plan2025.deductible.single, plan2026.deductible.single);
     changes.push({
       field: 'deductible_single',
       displayName: 'Deductible (Single)',
+      category: 'deductible',
       oldValue: formatCurrency(plan2025.deductible.single),
       newValue: formatCurrency(plan2026.deductible.single),
-      changeType: determineChangeType(plan2025.deductible.single, plan2026.deductible.single),
+      changeType,
       percentChange: calculatePercentChange(plan2025.deductible.single, plan2026.deductible.single),
+      impact: determineImpact('deductible', changeType),
     });
   }
 
   if (plan2025.deductible.family !== plan2026.deductible.family) {
+    const changeType = determineChangeType(plan2025.deductible.family, plan2026.deductible.family);
     changes.push({
       field: 'deductible_family',
       displayName: 'Deductible (Family)',
+      category: 'deductible',
       oldValue: formatCurrency(plan2025.deductible.family),
       newValue: formatCurrency(plan2026.deductible.family),
-      changeType: determineChangeType(plan2025.deductible.family, plan2026.deductible.family),
+      changeType,
       percentChange: calculatePercentChange(plan2025.deductible.family, plan2026.deductible.family),
+      impact: determineImpact('deductible', changeType),
     });
   }
 
-  // Compare OOP max
+  // Compare OOP Max
   if (plan2025.oopMax.single !== plan2026.oopMax.single) {
+    const changeType = determineChangeType(plan2025.oopMax.single, plan2026.oopMax.single);
     changes.push({
-      field: 'oopMax_single',
-      displayName: 'Out-of-Pocket Max (Single)',
+      field: 'oop_single',
+      displayName: 'OOP Max (Single)',
+      category: 'deductible',
       oldValue: formatCurrency(plan2025.oopMax.single),
       newValue: formatCurrency(plan2026.oopMax.single),
-      changeType: determineChangeType(plan2025.oopMax.single, plan2026.oopMax.single),
+      changeType,
       percentChange: calculatePercentChange(plan2025.oopMax.single, plan2026.oopMax.single),
+      impact: determineImpact('deductible', changeType),
     });
   }
 
   if (plan2025.oopMax.family !== plan2026.oopMax.family) {
+    const changeType = determineChangeType(plan2025.oopMax.family, plan2026.oopMax.family);
     changes.push({
-      field: 'oopMax_family',
-      displayName: 'Out-of-Pocket Max (Family)',
+      field: 'oop_family',
+      displayName: 'OOP Max (Family)',
+      category: 'deductible',
       oldValue: formatCurrency(plan2025.oopMax.family),
       newValue: formatCurrency(plan2026.oopMax.family),
-      changeType: determineChangeType(plan2025.oopMax.family, plan2026.oopMax.family),
+      changeType,
       percentChange: calculatePercentChange(plan2025.oopMax.family, plan2026.oopMax.family),
+      impact: determineImpact('deductible', changeType),
     });
   }
 
   // Compare coinsurance
   if (plan2025.coinsurance !== plan2026.coinsurance) {
+    const changeType = determineChangeType(plan2025.coinsurance, plan2026.coinsurance);
     changes.push({
       field: 'coinsurance',
       displayName: 'Coinsurance',
-      oldValue: formatPercentage(plan2025.coinsurance),
-      newValue: formatPercentage(plan2026.coinsurance),
-      changeType: determineChangeType(plan2025.coinsurance, plan2026.coinsurance),
+      category: 'copay',
+      oldValue: `${plan2025.coinsurance}/${100 - plan2025.coinsurance}`,
+      newValue: `${plan2026.coinsurance}/${100 - plan2026.coinsurance}`,
+      changeType,
+      impact: determineImpact('copay', changeType),
     });
-  }
-
-  // Compare copays
-  const copayFields: (keyof HealthPlan['copays'])[] = ['pcp', 'specialist', 'urgentCare', 'er', 'imaging', 'labs'];
-  const copayLabels: Record<string, string> = {
-    pcp: 'PCP Visit',
-    specialist: 'Specialist Visit',
-    urgentCare: 'Urgent Care',
-    er: 'Emergency Room',
-    imaging: 'Imaging',
-    labs: 'Labs',
-  };
-
-  for (const field of copayFields) {
-    const oldVal = plan2025.copays[field];
-    const newVal = plan2026.copays[field];
-    if (oldVal !== newVal) {
-      changes.push({
-        field: `copay_${field}`,
-        displayName: `${copayLabels[field]} Copay`,
-        oldValue: formatCurrency(oldVal),
-        newValue: formatCurrency(newVal),
-        changeType: determineChangeType(oldVal, newVal),
-        percentChange: calculatePercentChange(oldVal, newVal),
-      });
-    }
-  }
-
-  // Compare RX tiers
-  const rxFields: (keyof HealthPlan['rxTiers'])[] = ['generic', 'preferred', 'nonPreferred', 'specialty'];
-  const rxLabels: Record<string, string> = {
-    generic: 'Generic Rx',
-    preferred: 'Preferred Brand Rx',
-    nonPreferred: 'Non-Preferred Rx',
-    specialty: 'Specialty Rx',
-  };
-
-  for (const field of rxFields) {
-    const oldVal = plan2025.rxTiers[field];
-    const newVal = plan2026.rxTiers[field];
-    if (oldVal !== newVal && oldVal !== undefined && newVal !== undefined) {
-      changes.push({
-        field: `rx_${field}`,
-        displayName: `${rxLabels[field]} Copay`,
-        oldValue: formatCurrency(oldVal),
-        newValue: formatCurrency(newVal),
-        changeType: determineChangeType(oldVal, newVal),
-        percentChange: calculatePercentChange(oldVal, newVal),
-      });
-    }
   }
 
   // Compare HSA eligibility
   if (plan2025.hsaEligible !== plan2026.hsaEligible) {
     changes.push({
-      field: 'hsaEligible',
+      field: 'hsa',
       displayName: 'HSA Eligible',
+      category: 'benefits',
       oldValue: plan2025.hsaEligible ? 'Yes' : 'No',
       newValue: plan2026.hsaEligible ? 'Yes' : 'No',
-      changeType: plan2026.hsaEligible ? 'new' : 'removed',
+      changeType: plan2026.hsaEligible ? 'increase' : 'decrease',
+      impact: plan2026.hsaEligible ? 'positive' : 'negative',
     });
   }
 
   // Compare HRA
-  const hadHra = plan2025.hraAmount !== undefined;
-  const hasHra = plan2026.hraAmount !== undefined;
+  const hraChanged =
+    (plan2025.hraAmount?.single || 0) !== (plan2026.hraAmount?.single || 0) ||
+    (plan2025.hraAmount?.family || 0) !== (plan2026.hraAmount?.family || 0);
 
-  if (hadHra !== hasHra) {
+  if (hraChanged) {
+    const oldHra = plan2025.hraAmount
+      ? `${formatCurrency(plan2025.hraAmount.single)} / ${formatCurrency(plan2025.hraAmount.family)}`
+      : 'N/A';
+    const newHra = plan2026.hraAmount
+      ? `${formatCurrency(plan2026.hraAmount.single)} / ${formatCurrency(plan2026.hraAmount.family)}`
+      : 'N/A';
+    const changeType = determineChangeType(
+      plan2025.hraAmount?.single || 0,
+      plan2026.hraAmount?.single || 0
+    );
     changes.push({
-      field: 'hraEligible',
-      displayName: 'HRA Benefit',
-      oldValue: hadHra ? `${formatCurrency(plan2025.hraAmount!.single)}/${formatCurrency(plan2025.hraAmount!.family)}` : 'None',
-      newValue: hasHra ? `${formatCurrency(plan2026.hraAmount!.single)}/${formatCurrency(plan2026.hraAmount!.family)}` : 'None',
-      changeType: hasHra ? 'new' : 'removed',
+      field: 'hra',
+      displayName: 'Employer HRA',
+      category: 'benefits',
+      oldValue: oldHra,
+      newValue: newHra,
+      changeType,
+      impact: changeType === 'increase' ? 'positive' : changeType === 'decrease' ? 'negative' : 'neutral',
     });
-  } else if (hadHra && hasHra) {
-    if (plan2025.hraAmount!.single !== plan2026.hraAmount!.single) {
-      changes.push({
-        field: 'hra_single',
-        displayName: 'HRA Amount (Single)',
-        oldValue: formatCurrency(plan2025.hraAmount!.single),
-        newValue: formatCurrency(plan2026.hraAmount!.single),
-        changeType: determineChangeType(plan2025.hraAmount!.single, plan2026.hraAmount!.single),
-      });
-    }
   }
 
   // Generate summary
-  let summary = `Comparing ${plan2025.name} (2025) to ${plan2026.name} (2026):\n\n`;
+  const increaseCount = changes.filter((c) => c.changeType === 'increase').length;
+  const decreaseCount = changes.filter((c) => c.changeType === 'decrease').length;
 
-  const improvements = changes.filter(c => c.changeType === 'decrease' || c.changeType === 'new');
-  const worsenings = changes.filter(c => c.changeType === 'increase' || c.changeType === 'removed');
-  const neutral = changes.filter(c => c.changeType === 'same');
-
-  if (improvements.length > 0) {
-    summary += `✓ ${improvements.length} improvement(s): `;
-    summary += improvements.map(c => c.displayName).join(', ') + '\n';
-  }
-
-  if (worsenings.length > 0) {
-    summary += `✗ ${worsenings.length} change(s) to review: `;
-    summary += worsenings.map(c => c.displayName).join(', ') + '\n';
-  }
-
-  if (neutral.length > 0) {
-    summary += `○ ${neutral.length} other change(s)\n`;
-  }
-
+  let summary = '';
   if (changes.length === 0) {
-    summary = 'No significant changes between 2025 and 2026 plans.';
+    summary = 'No significant changes between plan years.';
+  } else {
+    const parts = [];
+    if (increaseCount > 0) {
+      parts.push(`${increaseCount} increase${increaseCount > 1 ? 's' : ''}`);
+    }
+    if (decreaseCount > 0) {
+      parts.push(`${decreaseCount} decrease${decreaseCount > 1 ? 's' : ''}`);
+    }
+    summary = `${changes.length} changes: ${parts.join(', ')}.`;
   }
 
   return {
@@ -281,43 +276,4 @@ export function compareYearOverYear(plan2025?: HealthPlan, plan2026?: HealthPlan
     changes,
     summary,
   };
-}
-
-export function generateWhatsNewSummary(plans2025: HealthPlan[], plans2026: HealthPlan[]): string {
-  let summary = '# What\'s New in 2026 Benefits\n\n';
-
-  // Network change
-  const oldCarrier = plans2025[0]?.carrier;
-  const newCarrier = plans2026[0]?.carrier;
-  if (oldCarrier !== newCarrier) {
-    summary += `## Network Change\n`;
-    summary += `We're transitioning from **${oldCarrier}** to **${newCarrier}** for 2026. `;
-    summary += `This brings new network options and plan designs.\n\n`;
-  }
-
-  // New plans
-  summary += `## 2026 Plan Options\n\n`;
-  for (const plan of plans2026) {
-    summary += `### ${plan.name}\n`;
-    summary += `- **Network:** ${plan.network}\n`;
-    summary += `- **Deductible:** ${formatCurrency(plan.deductible.single)} / ${formatCurrency(plan.deductible.family)}\n`;
-    summary += `- **OOP Max:** ${formatCurrency(plan.oopMax.single)} / ${formatCurrency(plan.oopMax.family)}\n`;
-    summary += `- **HSA Eligible:** ${plan.hsaEligible ? 'Yes' : 'No'}\n`;
-    if (plan.highlights) {
-      summary += `- **Key Features:**\n`;
-      plan.highlights.forEach(h => {
-        summary += `  - ${h}\n`;
-      });
-    }
-    summary += '\n';
-  }
-
-  // Key changes
-  summary += `## Key Changes from 2025\n\n`;
-  summary += `- **New carrier:** Oxford replaces Cigna\n`;
-  summary += `- **Two HSA options:** Basic A and Basic B both support HSA\n`;
-  summary += `- **Lower OOP maximums:** Most plans have reduced out-of-pocket limits\n`;
-  summary += `- **Specialty drug changes:** New accumulator program rules apply\n`;
-
-  return summary;
 }

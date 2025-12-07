@@ -1,10 +1,28 @@
 'use client';
 
 import { usePlansStore } from '@/lib/store';
-import { EnrollmentType } from '@/types';
-import { formatCurrency, getEnrollmentLabel } from '@/lib/utils';
+import { EnrollmentType, IncomeTier } from '@/types';
+import { formatCurrency, getEnrollmentLabel, getIncomeTierLabel } from '@/lib/utils';
+import {
+  UserIcon,
+  UserGroupIcon,
+  UsersIcon,
+  HomeIcon,
+  CurrencyDollarIcon,
+  BeakerIcon,
+  HeartIcon,
+  BuildingOffice2Icon,
+} from '@heroicons/react/24/outline';
 
-const enrollmentTypes: EnrollmentType[] = ['single', 'employeeSpouse', 'employeeChildren', 'family'];
+const enrollmentTypes: EnrollmentType[] = ['single', 'couple', 'employeeChild', 'family'];
+const incomeTiers: IncomeTier[] = ['standard', 'high'];
+
+const enrollmentIcons: Record<EnrollmentType, React.ElementType> = {
+  single: UserIcon,
+  couple: UserGroupIcon,
+  employeeChild: UsersIcon,
+  family: HomeIcon,
+};
 
 interface SliderFieldProps {
   label: string;
@@ -15,6 +33,7 @@ interface SliderFieldProps {
   step?: number;
   unit?: string;
   helpText?: string;
+  color?: 'blue' | 'emerald' | 'violet' | 'amber';
 }
 
 function SliderField({
@@ -26,12 +45,20 @@ function SliderField({
   step = 1,
   unit = '',
   helpText,
+  color = 'blue',
 }: SliderFieldProps) {
+  const colorClasses = {
+    blue: 'accent-blue-600 text-blue-600',
+    emerald: 'accent-emerald-600 text-emerald-600',
+    violet: 'accent-violet-600 text-violet-600',
+    amber: 'accent-amber-600 text-amber-600',
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <label className="text-sm font-medium text-gray-700">{label}</label>
-        <span className="text-sm font-semibold text-blue-600">
+        <label className="text-sm font-medium text-slate-700">{label}</label>
+        <span className={`text-sm font-bold ${colorClasses[color].split(' ')[1]}`}>
           {value}{unit}
         </span>
       </div>
@@ -42,10 +69,10 @@ function SliderField({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+        className={`w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer ${colorClasses[color].split(' ')[0]}`}
       />
       {helpText && (
-        <p className="text-xs text-gray-500">{helpText}</p>
+        <p className="text-xs text-slate-500">{helpText}</p>
       )}
     </div>
   );
@@ -60,22 +87,22 @@ interface ToggleFieldProps {
 
 function ToggleField({ label, checked, onChange, helpText }: ToggleFieldProps) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between py-1">
       <div>
-        <span className="text-sm font-medium text-gray-700">{label}</span>
+        <span className="text-sm font-medium text-slate-700">{label}</span>
         {helpText && (
-          <p className="text-xs text-gray-500 mt-0.5">{helpText}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{helpText}</p>
         )}
       </div>
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-          checked ? 'bg-blue-600' : 'bg-gray-200'
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+          checked ? 'bg-blue-600' : 'bg-slate-300'
         }`}
       >
         <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+          className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
             checked ? 'translate-x-6' : 'translate-x-1'
           }`}
         />
@@ -104,11 +131,11 @@ function NumberInput({
   helpText,
 }: NumberInputProps) {
   return (
-    <div className="space-y-1">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
+    <div className="space-y-1.5">
+      <label className="text-sm font-medium text-slate-700">{label}</label>
       <div className="relative">
         {prefix && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">
             {prefix}
           </span>
         )}
@@ -118,14 +145,37 @@ function NumberInput({
           onChange={(e) => onChange(Number(e.target.value))}
           min={min}
           max={max}
-          className={`w-full rounded-lg border border-gray-300 py-2 ${
+          className={`w-full rounded-lg border border-slate-300 py-2.5 ${
             prefix ? 'pl-7' : 'pl-3'
-          } pr-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500`}
+          } pr-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all bg-white`}
         />
       </div>
       {helpText && (
-        <p className="text-xs text-gray-500">{helpText}</p>
+        <p className="text-xs text-slate-500">{helpText}</p>
       )}
+    </div>
+  );
+}
+
+interface SectionProps {
+  title: string;
+  icon: React.ElementType;
+  iconColor: string;
+  children: React.ReactNode;
+}
+
+function Section({ title, icon: Icon, iconColor, children }: SectionProps) {
+  return (
+    <div className="space-y-4">
+      <h4 className="font-semibold text-slate-900 flex items-center gap-2">
+        <div className={`w-8 h-8 rounded-lg ${iconColor} flex items-center justify-center`}>
+          <Icon className="h-4 w-4 text-white" />
+        </div>
+        {title}
+      </h4>
+      <div className="space-y-4 pl-10">
+        {children}
+      </div>
     </div>
   );
 }
@@ -134,47 +184,71 @@ export default function ScenarioForm() {
   const { scenario, setScenario, resetScenario } = usePlansStore();
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="font-semibold text-gray-900">Your Scenario</h3>
+    <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+      {/* Header */}
+      <div className="px-5 py-4 bg-gradient-to-r from-slate-800 to-slate-700 flex justify-between items-center">
+        <h3 className="font-bold text-white text-lg">Your Scenario</h3>
         <button
           onClick={resetScenario}
-          className="text-sm text-blue-600 hover:text-blue-700"
+          className="text-sm text-slate-300 hover:text-white transition-colors px-3 py-1 rounded-lg hover:bg-white/10"
         >
           Reset
         </button>
       </div>
 
-      <div className="p-5 space-y-6">
+      <div className="p-5 space-y-8">
         {/* Enrollment Type */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
-            Enrollment Type
+        <div className="space-y-3">
+          <label className="text-sm font-semibold text-slate-900">
+            Coverage Type
           </label>
           <div className="grid grid-cols-2 gap-2">
-            {enrollmentTypes.map((type) => (
+            {enrollmentTypes.map((type) => {
+              const Icon = enrollmentIcons[type];
+              return (
+                <button
+                  key={type}
+                  onClick={() => setScenario({ enrollmentType: type })}
+                  className={`flex items-center gap-2 px-3 py-3 text-sm rounded-xl border-2 transition-all ${
+                    scenario.enrollmentType === type
+                      ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-sm'
+                      : 'border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
+                  }`}
+                >
+                  <Icon className={`h-5 w-5 ${scenario.enrollmentType === type ? 'text-blue-600' : 'text-slate-400'}`} />
+                  <span className="font-medium">{getEnrollmentLabel(type)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Income Tier */}
+        <div className="space-y-3">
+          <label className="text-sm font-semibold text-slate-900">
+            Household Income
+            <span className="font-normal text-slate-500 ml-1">(affects Value plan premiums)</span>
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {incomeTiers.map((tier) => (
               <button
-                key={type}
-                onClick={() => setScenario({ enrollmentType: type })}
-                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                  scenario.enrollmentType === type
-                    ? 'bg-blue-50 border-blue-500 text-blue-700'
-                    : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                key={tier}
+                onClick={() => setScenario({ incomeTier: tier })}
+                className={`flex items-center justify-center gap-2 px-3 py-3 text-sm rounded-xl border-2 transition-all ${
+                  scenario.incomeTier === tier
+                    ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm'
+                    : 'border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
                 }`}
               >
-                {getEnrollmentLabel(type)}
+                <CurrencyDollarIcon className={`h-5 w-5 ${scenario.incomeTier === tier ? 'text-emerald-600' : 'text-slate-400'}`} />
+                <span className="font-medium">{getIncomeTierLabel(tier)}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Medical Usage */}
-        <div className="space-y-4">
-          <h4 className="font-medium text-gray-900 flex items-center">
-            <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            Expected Medical Usage
-          </h4>
-
+        <Section title="Medical Usage" icon={HeartIcon} iconColor="bg-rose-500">
           <SliderField
             label="PCP Visits"
             value={scenario.pcpVisits}
@@ -183,6 +257,7 @@ export default function ScenarioForm() {
             max={24}
             unit="/year"
             helpText="Typical: 2-4 visits/year"
+            color="blue"
           />
 
           <SliderField
@@ -192,6 +267,7 @@ export default function ScenarioForm() {
             min={0}
             max={24}
             unit="/year"
+            color="blue"
           />
 
           <SliderField
@@ -201,6 +277,7 @@ export default function ScenarioForm() {
             min={0}
             max={20}
             unit="/year"
+            color="blue"
           />
 
           <SliderField
@@ -210,6 +287,7 @@ export default function ScenarioForm() {
             min={0}
             max={10}
             unit="/year"
+            color="blue"
           />
 
           <SliderField
@@ -219,6 +297,7 @@ export default function ScenarioForm() {
             min={0}
             max={5}
             unit="/year"
+            color="amber"
           />
 
           <SliderField
@@ -228,16 +307,12 @@ export default function ScenarioForm() {
             min={0}
             max={10}
             unit="/year"
+            color="amber"
           />
-        </div>
+        </Section>
 
         {/* Prescription Usage */}
-        <div className="space-y-4">
-          <h4 className="font-medium text-gray-900 flex items-center">
-            <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-            Prescription Usage
-          </h4>
-
+        <Section title="Prescriptions" icon={BeakerIcon} iconColor="bg-emerald-500">
           <SliderField
             label="Generic Medications"
             value={scenario.genericRxCount}
@@ -246,6 +321,7 @@ export default function ScenarioForm() {
             max={10}
             unit=" ongoing"
             helpText="Number of ongoing generic prescriptions"
+            color="emerald"
           />
 
           <SliderField
@@ -255,6 +331,7 @@ export default function ScenarioForm() {
             min={0}
             max={5}
             unit=" ongoing"
+            color="emerald"
           />
 
           <ToggleField
@@ -265,7 +342,7 @@ export default function ScenarioForm() {
           />
 
           {scenario.hasSpecialtyDrug && (
-            <div className="pl-4 border-l-2 border-blue-200 space-y-4">
+            <div className="pl-4 border-l-2 border-emerald-200 space-y-4 bg-emerald-50/50 rounded-r-lg py-3 pr-3">
               <NumberInput
                 label="Monthly Drug Cost"
                 value={scenario.specialtyDrugMonthlyCost}
@@ -281,7 +358,7 @@ export default function ScenarioForm() {
               />
 
               {scenario.usesManufacturerCopayCard && (
-                <div className="space-y-3 pl-4 border-l-2 border-green-200">
+                <div className="space-y-3 pl-4 border-l-2 border-blue-200">
                   <ToggleField
                     label="Card counts toward deductible?"
                     checked={scenario.manufacturerCardCountsToDeductible}
@@ -298,22 +375,17 @@ export default function ScenarioForm() {
               )}
             </div>
           )}
-        </div>
+        </Section>
 
         {/* Tax-Advantaged Accounts */}
-        <div className="space-y-4">
-          <h4 className="font-medium text-gray-900 flex items-center">
-            <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
-            Tax-Advantaged Accounts
-          </h4>
-
+        <Section title="Tax Accounts" icon={BuildingOffice2Icon} iconColor="bg-violet-500">
           <NumberInput
             label="HSA Contribution (Annual)"
             value={scenario.hsaContribution}
             onChange={(v) => setScenario({ hsaContribution: v })}
             prefix="$"
-            max={8300}
-            helpText="2024 max: $4,150 (single) / $8,300 (family)"
+            max={8550}
+            helpText="2025 max: $4,300 (single) / $8,550 (family)"
           />
 
           <NumberInput
@@ -321,8 +393,8 @@ export default function ScenarioForm() {
             value={scenario.fsaMedicalContribution}
             onChange={(v) => setScenario({ fsaMedicalContribution: v })}
             prefix="$"
-            max={3200}
-            helpText="2024 max: $3,200"
+            max={3300}
+            helpText="2025 max: $3,300"
           />
 
           <NumberInput
@@ -339,12 +411,13 @@ export default function ScenarioForm() {
             value={scenario.marginalTaxRate}
             onChange={(v) => setScenario({ marginalTaxRate: v })}
             min={10}
-            max={45}
+            max={50}
             step={1}
             unit="%"
-            helpText="Federal + State combined"
+            helpText="Federal + State + FICA combined"
+            color="violet"
           />
-        </div>
+        </Section>
       </div>
     </div>
   );

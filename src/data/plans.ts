@@ -1,49 +1,181 @@
 import { HealthPlan } from '@/types';
 
 export const healthPlans: HealthPlan[] = [
-  // 2025 Plans
+  // ==================== 2025 PLANS (Cigna) ====================
+
   {
-    id: '2025-basic-cigna',
+    id: '2025-buy-up',
     year: 2025,
-    name: '2025 Basic (Cigna)',
+    name: 'Buy-Up Plan',
+    shortName: 'Buy-Up',
     carrier: 'Cigna',
-    network: 'Cigna Open Access',
+    network: 'Cigna Open Access Plus',
+    networkType: 'Open Access Plus',
 
     premiums: {
-      single: 45,
-      employeeSpouse: 95,
-      employeeChildren: 85,
-      family: 135,
+      single: 171,
+      couple: 360,
+      employeeChild: 300,
+      family: 525,
     },
 
     deductible: {
-      single: 2000,
-      family: 4000,
+      single: 1000,
+      family: 2000,
     },
     oopMax: {
-      single: 5500,
-      family: 11000,
+      single: 5000,
+      family: 10000,
     },
-    coinsurance: 30,
+    coinsurance: 80, // 80/20
 
     copays: {
-      pcp: 30,
-      specialist: 50,
-      urgentCare: 75,
-      er: 250,
-      imaging: 100,
-      labs: 30,
+      pcp: 20,
+      specialist: 40,
+      urgentCare: 40,
+      er: 100,
+      imaging: 'Deductible + 20%',
+      labs: 'Deductible + 20%',
+    },
+    copaysBeforeDeductible: true,
+    copayNotes: 'PCP, Specialist, Urgent Care, and ER copays apply before deductible',
+
+    rxTiers: {
+      tier1: 15,
+      tier2: 35,
+      tier3: 75,
+      deductible: 0,
+    },
+    rxNotes: 'No Rx deductible - copays apply from day one',
+
+    hsaEligible: false,
+
+    description: 'Our richest plan with the lowest deductible and copays before deductible. Best for those who expect frequent healthcare visits or want more predictable costs.',
+    highlights: [
+      'Lowest deductible: $1,000 / $2,000',
+      'Copays before deductible for office visits',
+      '$0 Rx deductible',
+      'Widest Cigna network access',
+    ],
+    considerations: [
+      'Highest weekly premiums',
+      'Not HSA eligible',
+    ],
+    isActive: true,
+  },
+
+  {
+    id: '2025-value',
+    year: 2025,
+    name: 'Value Plan',
+    shortName: 'Value',
+    carrier: 'Cigna',
+    network: 'Cigna Open Access',
+    networkType: 'Open Access',
+
+    premiums: {
+      single: 87,
+      couple: 184,
+      employeeChild: 153,
+      family: 267,
+    },
+    premiumsHighIncome: {
+      single: 102,
+      couple: 214,
+      employeeChild: 178,
+      family: 311,
+    },
+
+    deductible: {
+      single: 1500,
+      family: 3000,
+    },
+    oopMax: {
+      single: 6350,
+      family: 12700,
+    },
+    coinsurance: 70, // 70/30
+
+    copays: {
+      pcp: 20,
+      specialist: 40,
+      urgentCare: 40,
+      er: 100,
+      imaging: 'Deductible + 30%',
+      labs: 'Deductible + 30%',
+    },
+    copaysBeforeDeductible: true,
+    copayNotes: 'PCP, Specialist, Urgent Care, and ER copays apply before deductible',
+
+    rxTiers: {
+      tier1: 15,
+      tier2: 35,
+      tier3: 75,
+      deductible: 100,
+    },
+    rxNotes: '$100 Rx deductible applies before copays',
+
+    hsaEligible: false,
+
+    description: 'A balanced plan with moderate premiums and copays before deductible. Good for those who want predictability without the highest premiums.',
+    highlights: [
+      'Income-based premiums (lower if <$200k)',
+      'Copays before deductible for office visits',
+      'Moderate deductible: $1,500 / $3,000',
+      '$100 Rx deductible',
+    ],
+    considerations: [
+      'Higher premiums for income >$200k',
+      'Not HSA eligible',
+      'Higher OOP max than Buy-Up',
+    ],
+    isActive: true,
+  },
+
+  {
+    id: '2025-basic',
+    year: 2025,
+    name: 'Basic Plan (HRA)',
+    shortName: 'Basic',
+    carrier: 'Cigna',
+    network: 'Cigna Open Access',
+    networkType: 'Open Access',
+
+    premiums: {
+      single: 40,
+      couple: 119,
+      employeeChild: 99,
+      family: 173,
+    },
+
+    deductible: {
+      single: 2500,
+      family: 5000,
+    },
+    oopMax: {
+      single: 6450,
+      family: 12900,
+    },
+    coinsurance: 70, // 70/30
+
+    copays: {
+      pcp: 'Deductible + 30%',
+      specialist: 'Deductible + 30%',
+      urgentCare: 'Deductible + 30%',
+      er: 'Deductible + 30%',
+      imaging: 'Deductible + 30%',
+      labs: 'Deductible + 30%',
     },
     copaysBeforeDeductible: false,
+    copayNotes: 'All services subject to deductible first, then 30% coinsurance',
 
-    rxDeductibleApplies: true,
     rxTiers: {
-      generic: 15,
-      preferred: 35,
-      nonPreferred: 60,
-      specialty: 100,
-      specialtyCoinsurance: 30,
+      tier1: 25,
+      tier2: 50,
+      tier3: 75,
+      deductible: 'medical',
     },
+    rxNotes: 'Medical deductible applies to prescriptions',
 
     hsaEligible: true,
     hraAmount: {
@@ -51,29 +183,37 @@ export const healthPlans: HealthPlan[] = [
       family: 2000,
     },
 
-    specialtyAccumulatorProgram: false,
-
-    description: 'High-deductible health plan with HSA eligibility and HRA contribution from employer.',
+    description: 'High-deductible health plan with HSA eligibility and employer HRA contribution. Best for healthy individuals who want the lowest premiums and tax advantages.',
     highlights: [
+      'Lowest weekly premiums',
       'HSA eligible - triple tax advantage',
-      'Employer HRA contribution: $1,000/$2,000',
-      'Lower premiums',
-      'Cigna Open Access network',
+      'Employer HRA: $1,000 / $2,000',
+      'HRA can offset deductible costs',
+    ],
+    considerations: [
+      'Highest deductible: $2,500 / $5,000',
+      'Must meet deductible before most coverage',
+      'Medical deductible applies to Rx',
     ],
     isActive: true,
   },
+
+  // ==================== 2026 PLANS (Oxford/UHC) ====================
+
   {
-    id: '2025-buy-up',
-    year: 2025,
-    name: '2025 Buy-Up',
-    carrier: 'Cigna',
-    network: 'Cigna Open Access Plus',
+    id: '2026-buy-up',
+    year: 2026,
+    name: 'Buy-Up Plan',
+    shortName: 'Buy-Up',
+    carrier: 'Oxford/UHC',
+    network: 'Oxford Freedom',
+    networkType: 'Freedom',
 
     premiums: {
-      single: 75,
-      employeeSpouse: 155,
-      employeeChildren: 140,
-      family: 220,
+      single: 171,
+      couple: 360,
+      employeeChild: 300,
+      family: 525,
     },
 
     deductible: {
@@ -84,108 +224,128 @@ export const healthPlans: HealthPlan[] = [
       single: 4000,
       family: 8000,
     },
-    coinsurance: 20,
-
-    copays: {
-      pcp: 25,
-      specialist: 40,
-      urgentCare: 50,
-      er: 200,
-      imaging: 75,
-      labs: 20,
-    },
-    copaysBeforeDeductible: true,
-
-    rxDeductibleApplies: false,
-    rxTiers: {
-      generic: 10,
-      preferred: 30,
-      nonPreferred: 50,
-      specialty: 75,
-    },
-
-    hsaEligible: false,
-
-    specialtyAccumulatorProgram: false,
-
-    description: 'Lower deductible plan with copays before deductible. Good for predictable healthcare needs.',
-    highlights: [
-      'Lower deductible: $1,000/$2,000',
-      'Copays before deductible',
-      'Lower out-of-pocket maximum',
-      'Richer prescription coverage',
-    ],
-    isActive: true,
-  },
-  {
-    id: '2025-value',
-    year: 2025,
-    name: '2025 Value Plan',
-    carrier: 'Cigna',
-    network: 'Cigna LocalPlus',
-
-    premiums: {
-      single: 95,
-      employeeSpouse: 195,
-      employeeChildren: 175,
-      family: 275,
-    },
-
-    deductible: {
-      single: 750,
-      family: 1500,
-    },
-    oopMax: {
-      single: 6000,
-      family: 12000,
-    },
-    coinsurance: 20,
+    coinsurance: 90, // 90/10
 
     copays: {
       pcp: 20,
-      specialist: 35,
+      specialist: 40,
       urgentCare: 40,
-      er: 150,
-      imaging: 50,
-      labs: 15,
+      er: 100,
+      imaging: 'Deductible + 10%',
+      labs: 'Deductible + 10%',
     },
     copaysBeforeDeductible: true,
+    copayNotes: 'PCP, Specialist, Urgent Care, and ER copays apply before deductible',
 
-    rxDeductibleApplies: false,
     rxTiers: {
-      generic: 10,
-      preferred: 25,
-      nonPreferred: 45,
-      specialty: 60,
+      tier1: 25,
+      tier2: 50,
+      tier3: 75,
+      deductible: 100,
     },
+    rxNotes: '$100 Rx deductible applies before copays',
 
     hsaEligible: false,
+    networkNotes: 'Freedom network - widest Oxford network access',
 
-    specialtyAccumulatorProgram: false,
-
-    description: 'Lowest deductible with higher premiums. Best for frequent healthcare users.',
+    description: 'Our richest plan with the lowest deductible, lowest OOP max, and best coinsurance. Ideal for those expecting significant healthcare needs.',
     highlights: [
-      'Lowest deductible: $750/$1,500',
-      'Copays before deductible',
-      'Lower copays for routine care',
-      'Best for high utilizers',
+      'Lowest deductible: $1,000 / $2,000',
+      'Lowest OOP max: $4,000 / $8,000',
+      'Best coinsurance: 90/10',
+      'Oxford Freedom - widest network',
+    ],
+    considerations: [
+      'Highest weekly premiums',
+      'Not HSA eligible',
+      'New $100 Rx deductible (was $0)',
     ],
     isActive: true,
   },
 
-  // 2026 Plans
   {
-    id: '2026-basic-a-liberty',
+    id: '2026-value',
     year: 2026,
-    name: '2026 Basic A (Liberty HSA)',
-    carrier: 'Oxford',
+    name: 'Value Plan',
+    shortName: 'Value',
+    carrier: 'Oxford/UHC',
     network: 'Oxford Liberty',
+    networkType: 'Liberty',
 
     premiums: {
-      single: 48,
-      employeeSpouse: 100,
-      employeeChildren: 90,
-      family: 142,
+      single: 87,
+      couple: 184,
+      employeeChild: 153,
+      family: 267,
+    },
+    premiumsHighIncome: {
+      single: 102,
+      couple: 214,
+      employeeChild: 178,
+      family: 311,
+    },
+
+    deductible: {
+      single: 1500,
+      family: 3000,
+    },
+    oopMax: {
+      single: 6350,
+      family: 12700,
+    },
+    coinsurance: 70, // 70/30
+
+    copays: {
+      pcp: 20,
+      specialist: 40,
+      urgentCare: 40,
+      er: 100,
+      imaging: 'Deductible + 30%',
+      labs: 'Deductible + 30%',
+    },
+    copaysBeforeDeductible: true,
+    copayNotes: 'PCP, Specialist, Urgent Care, and ER copays apply before deductible',
+
+    rxTiers: {
+      tier1: 25,
+      tier2: 50,
+      tier3: 75,
+      deductible: 100,
+    },
+    rxNotes: '$100 Rx deductible applies before copays',
+
+    hsaEligible: false,
+    networkNotes: 'Liberty network - broad Oxford network access',
+
+    description: 'A balanced plan with moderate premiums and copays before deductible. Good middle ground between cost and coverage.',
+    highlights: [
+      'Income-based premiums (lower if <$200k)',
+      'Copays before deductible for office visits',
+      'Moderate deductible: $1,500 / $3,000',
+      'Oxford Liberty network',
+    ],
+    considerations: [
+      'Higher premiums for income >$200k',
+      'Not HSA eligible',
+      'Rx copays increased from 2025',
+    ],
+    isActive: true,
+  },
+
+  {
+    id: '2026-basic-a',
+    year: 2026,
+    name: 'Basic A - Liberty HSA',
+    shortName: 'Basic A',
+    carrier: 'Oxford/UHC',
+    network: 'Oxford Liberty',
+    networkType: 'Liberty',
+
+    premiums: {
+      single: 69,
+      couple: 144,
+      employeeChild: 120,
+      family: 209,
     },
 
     deductible: {
@@ -196,208 +356,115 @@ export const healthPlans: HealthPlan[] = [
       single: 5000,
       family: 10000,
     },
-    coinsurance: 30,
+    coinsurance: 70, // 70/30
 
     copays: {
-      pcp: 30,
-      specialist: 50,
-      urgentCare: 75,
-      er: 250,
-      imaging: 100,
-      labs: 30,
+      pcp: 'Deductible + 30%',
+      specialist: 'Deductible + 30%',
+      urgentCare: 'Deductible + 30%',
+      er: 'Deductible + 30%',
+      imaging: 'Deductible + 30%',
+      labs: 'Deductible + 30%',
     },
     copaysBeforeDeductible: false,
+    copayNotes: 'All services subject to deductible first, then 30% coinsurance',
 
-    rxDeductibleApplies: true,
     rxTiers: {
-      generic: 15,
-      preferred: 40,
-      nonPreferred: 65,
-      specialty: 75,
-      specialtyCoinsurance: 30,
+      tier1: 25,
+      tier2: 50,
+      tier3: 75,
+      deductible: 'medical',
     },
+    rxNotes: 'Medical deductible applies to prescriptions',
 
     hsaEligible: true,
+    networkNotes: 'Liberty network - broad Oxford network access',
 
-    specialtyAccumulatorProgram: true,
-
-    description: 'HSA-eligible high-deductible plan with Oxford Liberty network. Lower OOP max than 2025.',
+    description: 'HSA-eligible high-deductible plan with lower premiums than Basic B but no HRA. Best for those who want to maximize HSA contributions.',
     highlights: [
       'HSA eligible - triple tax advantage',
-      'Lower OOP max: $5,000/$10,000',
-      'New Oxford Liberty network',
-      'Tier 3 specialty copay: $75',
+      'Lower premiums than Basic B',
+      'Lower OOP max: $5,000 / $10,000',
+      'Oxford Liberty network',
+    ],
+    considerations: [
+      'No employer HRA contribution',
+      'Must meet deductible before coverage',
+      'Medical deductible applies to Rx',
     ],
     isActive: true,
   },
+
   {
-    id: '2026-basic-b-liberty-plus',
+    id: '2026-basic-b',
     year: 2026,
-    name: '2026 Basic B (Liberty HSA Plus)',
-    carrier: 'Oxford',
-    network: 'Oxford Liberty',
+    name: 'Basic B - Metro HSA + HRA',
+    shortName: 'Basic B',
+    carrier: 'Oxford/UHC',
+    network: 'Oxford Metro',
+    networkType: 'Metro',
 
     premiums: {
-      single: 58,
-      employeeSpouse: 120,
-      employeeChildren: 108,
-      family: 170,
+      single: 40,
+      couple: 119,
+      employeeChild: 99,
+      family: 173,
     },
 
     deductible: {
-      single: 1500,
-      family: 3000,
+      single: 2500,
+      family: 5000,
     },
     oopMax: {
-      single: 4500,
-      family: 9000,
+      single: 6450,
+      family: 12900,
     },
-    coinsurance: 25,
+    coinsurance: 50, // 50/50
 
     copays: {
-      pcp: 25,
-      specialist: 45,
-      urgentCare: 65,
-      er: 225,
-      imaging: 85,
-      labs: 25,
+      pcp: 40,
+      specialist: 60,
+      urgentCare: 'Deductible + 50%',
+      er: '100 + Deductible + 50%',
+      imaging: 'Deductible + 50%',
+      labs: 'Deductible + 50%',
     },
     copaysBeforeDeductible: false,
+    copayNotes: 'PCP $40 and Specialist $60 after deductible. ER has $100 copay plus deductible and coinsurance.',
 
-    rxDeductibleApplies: true,
     rxTiers: {
-      generic: 12,
-      preferred: 35,
-      nonPreferred: 55,
-      specialty: 65,
-      specialtyCoinsurance: 25,
+      tier1: 25,
+      tier2: 50,
+      tier3: 75,
+      deductible: 'medical',
     },
+    rxNotes: 'Medical deductible applies. Metro network excludes CVS pharmacies.',
 
     hsaEligible: true,
-
-    specialtyAccumulatorProgram: true,
-
-    description: 'Enhanced HSA plan with lower deductible and better copays. Still HSA eligible.',
-    highlights: [
-      'HSA eligible with lower deductible',
-      'Deductible: $1,500/$3,000',
-      'Better copays than Basic A',
-      '25% coinsurance (vs 30%)',
-    ],
-    isActive: true,
-  },
-  {
-    id: '2026-buy-up-oxford',
-    year: 2026,
-    name: '2026 Buy-Up (Oxford)',
-    carrier: 'Oxford',
-    network: 'Oxford Freedom',
-
-    premiums: {
-      single: 82,
-      employeeSpouse: 168,
-      employeeChildren: 152,
-      family: 238,
-    },
-
-    deductible: {
+    hraAmount: {
       single: 1000,
       family: 2000,
     },
-    oopMax: {
-      single: 4000,
-      family: 8000,
-    },
-    coinsurance: 20,
+    networkNotes: 'Metro network - smaller network, excludes CVS pharmacies',
 
-    copays: {
-      pcp: 25,
-      specialist: 40,
-      urgentCare: 50,
-      er: 200,
-      imaging: 75,
-      labs: 20,
-    },
-    copaysBeforeDeductible: true,
-
-    rxDeductibleApplies: false,
-    rxTiers: {
-      generic: 10,
-      preferred: 30,
-      nonPreferred: 50,
-      specialty: 75,
-    },
-
-    hsaEligible: false,
-
-    specialtyAccumulatorProgram: false,
-
-    description: 'Rich benefits plan with copays before deductible. Oxford Freedom network for widest access.',
+    description: 'Lowest premium HSA plan with employer HRA contribution. Best for healthy individuals who want minimal premiums and can use the Metro network.',
     highlights: [
-      'Low deductible: $1,000/$2,000',
-      'Copays before deductible',
-      'Oxford Freedom (widest network)',
-      'Best for predictable high usage',
+      'Lowest weekly premiums',
+      'HSA eligible - triple tax advantage',
+      'Employer HRA: $1,000 / $2,000',
+      'HRA can offset deductible costs',
     ],
-    isActive: true,
-  },
-  {
-    id: '2026-value-oxford',
-    year: 2026,
-    name: '2026 Value Plan',
-    carrier: 'Oxford',
-    network: 'Oxford Metro',
-
-    premiums: {
-      single: 98,
-      employeeSpouse: 202,
-      employeeChildren: 182,
-      family: 285,
-    },
-
-    deductible: {
-      single: 750,
-      family: 1500,
-    },
-    oopMax: {
-      single: 6000,
-      family: 12000,
-    },
-    coinsurance: 20,
-
-    copays: {
-      pcp: 20,
-      specialist: 35,
-      urgentCare: 40,
-      er: 150,
-      imaging: 50,
-      labs: 15,
-    },
-    copaysBeforeDeductible: true,
-
-    rxDeductibleApplies: false,
-    rxTiers: {
-      generic: 10,
-      preferred: 25,
-      nonPreferred: 45,
-      specialty: 60,
-    },
-
-    hsaEligible: false,
-
-    specialtyAccumulatorProgram: false,
-
-    description: 'Traditional copay-first plan with lowest deductible. Higher premiums, lower cost-sharing.',
-    highlights: [
-      'Lowest deductible: $750/$1,500',
-      'Traditional copay structure',
-      'Lower copays for all services',
-      'Oxford Metro network',
+    considerations: [
+      'Smallest network (Metro)',
+      'CVS pharmacies excluded',
+      'Highest coinsurance: 50/50',
+      'Highest deductible: $2,500 / $5,000',
     ],
     isActive: true,
   },
 ];
 
+// Helper functions
 export const getPlans = (): HealthPlan[] => healthPlans;
 
 export const getPlanById = (id: string): HealthPlan | undefined =>
@@ -412,3 +479,9 @@ export const get2026Plans = (): HealthPlan[] => getPlansByYear(2026);
 
 export const getActivePlans = (): HealthPlan[] =>
   healthPlans.filter(plan => plan.isActive);
+
+export const getHsaPlans = (): HealthPlan[] =>
+  healthPlans.filter(plan => plan.hsaEligible);
+
+export const getPlansByNetwork = (networkType: HealthPlan['networkType']): HealthPlan[] =>
+  healthPlans.filter(plan => plan.networkType === networkType);
