@@ -1,20 +1,20 @@
-import { HealthPlan, UserScenario, CostBreakdown, EnrollmentType } from '@/types';
+import { HealthPlan, UserScenario, CostBreakdown, EnrollmentType, IncomeTier } from '@/types';
 
 // Average costs for medical services (used for coinsurance calculations)
 const SERVICE_COSTS = {
-  pcpVisit: 200,
-  specialistVisit: 350,
+  pcpVisit: 250,
+  specialistVisit: 400,
   labTest: 150,
-  imagingTest: 500,
+  imagingTest: 600,
   erVisit: 2500,
-  urgentCareVisit: 300,
+  urgentCareVisit: 200,
 };
 
 // Average costs for prescriptions
 const RX_COSTS = {
   generic: 30,
-  brand: 200,
-  specialty: 3000, // Monthly
+  brand: 250,
+  specialty: 5000, // Monthly
 };
 
 function getDeductibleForEnrollment(plan: HealthPlan, enrollmentType: EnrollmentType): number {
@@ -31,8 +31,17 @@ function getOopMaxForEnrollment(plan: HealthPlan, enrollmentType: EnrollmentType
   return plan.oopMax.family;
 }
 
-function getPremiumForEnrollment(plan: HealthPlan, enrollmentType: EnrollmentType): number {
-  return plan.premiums[enrollmentType];
+function getPremiumForEnrollment(
+  plan: HealthPlan,
+  enrollmentType: EnrollmentType,
+  incomeTier: IncomeTier
+): number {
+  // Check if plan has high-income premiums and user is high income
+  const premiums = incomeTier === 'high' && plan.premiumsHighIncome
+    ? plan.premiumsHighIncome
+    : plan.premiums;
+
+  return premiums[enrollmentType];
 }
 
 function getHraForEnrollment(plan: HealthPlan, enrollmentType: EnrollmentType): number {
@@ -43,12 +52,43 @@ function getHraForEnrollment(plan: HealthPlan, enrollmentType: EnrollmentType): 
   return plan.hraAmount.family;
 }
 
+// Parse copay value - can be a number or a string like "Deductible + 30%"
+function parseCopay(copayValue: number | string): { isFlat: boolean; amount: number; coinsurancePercent?: number } {
+  if (typeof copayValue === 'number') {
+    return { isFlat: true, amount: copayValue };
+  }
+
+  // Parse string copays like "Deductible + 30%" or "100 + Deductible + 50%"
+  const lowerValue = copayValue.toLowerCase();
+
+  if (lowerValue.includes('deductible')) {
+    // Extract any flat copay amount (e.g., "100 + Deductible + 50%" -> 100)
+    const flatMatch = copayValue.match(/^(\d+)\s*\+/);
+    const flatAmount = flatMatch ? parseInt(flatMatch[1]) : 0;
+
+    // Extract coinsurance percentage
+    const percentMatch = copayValue.match(/(\d+)%/);
+    const coinsurancePercent = percentMatch ? parseInt(percentMatch[1]) : 0;
+
+    return { isFlat: false, amount: flatAmount, coinsurancePercent };
+  }
+
+  // Default fallback
+  return { isFlat: true, amount: 0 };
+}
+
+// Get coinsurance rate (plan pays this percentage, patient pays the rest)
+function getPatientCoinsurance(plan: HealthPlan): number {
+  return 100 - plan.coinsurance;
+}
+
 export function calculateCosts(plan: HealthPlan, scenario: UserScenario): CostBreakdown {
   const deductible = getDeductibleForEnrollment(plan, scenario.enrollmentType);
   const oopMax = getOopMaxForEnrollment(plan, scenario.enrollmentType);
-  const weeklyPremium = getPremiumForEnrollment(plan, scenario.enrollmentType);
+  const weeklyPremium = getPremiumForEnrollment(plan, scenario.enrollmentType, scenario.incomeTier);
   const annualPremium = weeklyPremium * 52;
   const hraCredit = getHraForEnrollment(plan, scenario.enrollmentType);
+  const patientCoinsurance = getPatientCoinsurance(plan);
 
   // Track spending against deductible and OOP max
   let runningDeductible = 0;
@@ -57,33 +97,50 @@ export function calculateCosts(plan: HealthPlan, scenario: UserScenario): CostBr
   // Helper to apply costs considering deductible and OOP max
   const applyCost = (
     serviceCost: number,
-    copay: number,
-    countsToDeductible: boolean = true,
-    copaysBeforeDeductible: boolean = plan.copaysBeforeDeductible
+    copayValue: number | string,
+    applyBeforeDeductible: boolean = plan.copaysBeforeDeductible
   ): number => {
+    const copay = parseCopay(copayValue);
     let patientCost = 0;
 
-    if (copaysBeforeDeductible) {
-      // Copay structure - patient pays copay, plan pays rest
-      patientCost = copay;
+    if (copay.isFlat && applyBeforeDeductible) {
+      // Simple flat copay before deductible
+      patientCost = copay.amount;
+    } else if (copay.isFlat && !applyBeforeDeductible) {
+      // Flat copay after deductible
+      if (runningDeductible < deductible) {
+        const remainingDeductible = deductible - runningDeductible;
+        const deductiblePortion = Math.min(serviceCost, remainingDeductible);
+        runningDeductible += deductiblePortion;
+
+        if (serviceCost > deductiblePortion) {
+          patientCost = deductiblePortion + copay.amount;
+        } else {
+          patientCost = deductiblePortion;
+        }
+      } else {
+        patientCost = copay.amount;
+      }
     } else {
-      // Deductible-first structure
-      if (runningDeductible < deductible && countsToDeductible) {
-        // Still paying toward deductible
+      // Deductible + coinsurance structure
+      const coinsuranceRate = (copay.coinsurancePercent || patientCoinsurance) / 100;
+
+      if (runningDeductible < deductible) {
         const remainingDeductible = deductible - runningDeductible;
         const deductiblePortion = Math.min(serviceCost, remainingDeductible);
         patientCost = deductiblePortion;
         runningDeductible += deductiblePortion;
 
-        // After deductible, apply coinsurance
         if (serviceCost > deductiblePortion) {
           const afterDeductible = serviceCost - deductiblePortion;
-          patientCost += afterDeductible * (plan.coinsurance / 100);
+          patientCost += afterDeductible * coinsuranceRate;
         }
       } else {
-        // Deductible met, apply coinsurance
-        patientCost = serviceCost * (plan.coinsurance / 100);
+        patientCost = serviceCost * coinsuranceRate;
       }
+
+      // Add any flat copay component (e.g., ER $100 + deductible + coinsurance)
+      patientCost += copay.amount;
     }
 
     // Apply OOP max cap
@@ -144,16 +201,28 @@ export function calculateCosts(plan: HealthPlan, scenario: UserScenario): CostBr
     totalRxCosts: 0,
   };
 
+  // Determine if Rx deductible applies
+  const rxDeductibleApplies = plan.rxTiers.deductible === 'medical';
+  const rxDeductibleAmount = typeof plan.rxTiers.deductible === 'number' ? plan.rxTiers.deductible : 0;
+  let rxDeductibleMet = rxDeductibleAmount === 0;
+
   // Generic prescriptions (typically 12 fills per year per prescription)
   const genericFills = scenario.genericRxCount * 12;
   for (let i = 0; i < genericFills; i++) {
-    if (plan.rxDeductibleApplies) {
-      rxCosts.genericCosts += applyCost(RX_COSTS.generic, plan.rxTiers.generic);
+    if (rxDeductibleApplies) {
+      rxCosts.genericCosts += applyCost(RX_COSTS.generic, plan.rxTiers.tier1, false);
     } else {
-      rxCosts.genericCosts += plan.rxTiers.generic;
-      runningOop += plan.rxTiers.generic;
+      // Check Rx deductible first
+      if (!rxDeductibleMet && rxDeductibleAmount > 0) {
+        const costTowardsDeductible = Math.min(RX_COSTS.generic, rxDeductibleAmount);
+        rxCosts.genericCosts += costTowardsDeductible;
+        rxDeductibleMet = true;
+      } else {
+        rxCosts.genericCosts += plan.rxTiers.tier1;
+      }
+      runningOop += rxCosts.genericCosts;
       if (runningOop > oopMax) {
-        rxCosts.genericCosts -= (runningOop - oopMax);
+        rxCosts.genericCosts = Math.max(0, rxCosts.genericCosts - (runningOop - oopMax));
         runningOop = oopMax;
       }
     }
@@ -162,11 +231,11 @@ export function calculateCosts(plan: HealthPlan, scenario: UserScenario): CostBr
   // Brand prescriptions
   const brandFills = scenario.brandRxCount * 12;
   for (let i = 0; i < brandFills; i++) {
-    if (plan.rxDeductibleApplies) {
-      rxCosts.brandCosts += applyCost(RX_COSTS.brand, plan.rxTiers.preferred);
+    if (rxDeductibleApplies) {
+      rxCosts.brandCosts += applyCost(RX_COSTS.brand, plan.rxTiers.tier2, false);
     } else {
-      rxCosts.brandCosts += plan.rxTiers.preferred;
-      runningOop += plan.rxTiers.preferred;
+      rxCosts.brandCosts += plan.rxTiers.tier2;
+      runningOop += plan.rxTiers.tier2;
       if (runningOop > oopMax) {
         rxCosts.brandCosts -= (runningOop - oopMax);
         runningOop = oopMax;
@@ -182,42 +251,21 @@ export function calculateCosts(plan: HealthPlan, scenario: UserScenario): CostBr
       let specialtyCostThisMonth = 0;
 
       if (scenario.usesManufacturerCopayCard) {
-        // Manufacturer copay card logic
-        const manufacturerPays = Math.min(monthlySpecialtyCost * 0.9, 15000); // Most cards cap at ~$15k/year
+        // Manufacturer copay card typically covers most of patient responsibility
+        const manufacturerCoverage = Math.min(monthlySpecialtyCost * 0.9, 15000 / 12);
 
-        if (plan.specialtyAccumulatorProgram) {
-          // Accumulator program - manufacturer payment doesn't count toward deductible/OOP
-          if (!scenario.manufacturerCardCountsToDeductible && !scenario.manufacturerCardCountsToOopMax) {
-            // Patient pays full copay/coinsurance, manufacturer covers most
-            const patientResponsibility = plan.rxTiers.specialty || monthlySpecialtyCost * (plan.coinsurance / 100);
-            specialtyCostThisMonth = Math.min(patientResponsibility, monthlySpecialtyCost - manufacturerPays);
-          } else {
-            // Depends on specific accumulator rules
-            specialtyCostThisMonth = plan.rxTiers.specialty;
-          }
+        if (rxDeductibleApplies) {
+          const fullCost = applyCost(monthlySpecialtyCost, plan.rxTiers.tier3, false);
+          specialtyCostThisMonth = Math.max(0, fullCost - manufacturerCoverage);
         } else {
-          // No accumulator - manufacturer payment counts toward deductible/OOP
-          const totalForAccumulator = plan.rxDeductibleApplies
-            ? Math.min(monthlySpecialtyCost, deductible - runningDeductible + monthlySpecialtyCost * (plan.coinsurance / 100))
-            : plan.rxTiers.specialty;
-
-          // Manufacturer covers most, patient pays remainder
-          specialtyCostThisMonth = Math.max(0, totalForAccumulator - manufacturerPays);
-
-          // But the full amount counts toward deductible/OOP
-          if (plan.rxDeductibleApplies) {
-            const deductiblePortion = Math.min(monthlySpecialtyCost, deductible - runningDeductible);
-            runningDeductible += deductiblePortion;
-          }
-          runningOop += totalForAccumulator;
+          specialtyCostThisMonth = Math.max(0, plan.rxTiers.tier3 - manufacturerCoverage);
         }
       } else {
-        // No manufacturer card - patient pays according to plan rules
-        if (plan.rxDeductibleApplies) {
-          specialtyCostThisMonth = applyCost(monthlySpecialtyCost, plan.rxTiers.specialty);
+        if (rxDeductibleApplies) {
+          specialtyCostThisMonth = applyCost(monthlySpecialtyCost, plan.rxTiers.tier3, false);
         } else {
-          specialtyCostThisMonth = plan.rxTiers.specialty;
-          runningOop += plan.rxTiers.specialty;
+          specialtyCostThisMonth = plan.rxTiers.tier3;
+          runningOop += plan.rxTiers.tier3;
         }
       }
 
@@ -311,9 +359,10 @@ export function compareAllPlans(plans: HealthPlan[], scenario: UserScenario): {
 
 export const defaultScenario: UserScenario = {
   enrollmentType: 'single',
-  pcpVisits: 4,
+  incomeTier: 'standard',
+  pcpVisits: 3,
   specialistVisits: 2,
-  labTests: 4,
+  labTests: 3,
   imagingTests: 1,
   erVisits: 0,
   urgentCareVisits: 1,
@@ -328,5 +377,5 @@ export const defaultScenario: UserScenario = {
   hsaContribution: 0,
   fsaMedicalContribution: 0,
   fsaDependentCareContribution: 0,
-  marginalTaxRate: 22,
+  marginalTaxRate: 25,
 };

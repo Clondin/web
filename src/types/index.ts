@@ -6,68 +6,76 @@ export interface CoverageLevel {
 }
 
 export interface Copays {
-  pcp: number;
-  specialist: number;
-  urgentCare: number;
-  er: number;
-  imaging: number;
-  labs: number;
+  pcp: number | string; // Can be a number or "Deductible + coinsurance"
+  specialist: number | string;
+  urgentCare: number | string;
+  er: number | string;
+  imaging: number | string;
+  labs: number | string;
 }
 
 export interface RxTiers {
-  generic: number;
-  preferred: number;
-  nonPreferred: number;
-  specialty: number;
-  specialtyCoinsurance?: number;
+  tier1: number; // Generic
+  tier2: number; // Preferred Brand
+  tier3: number; // Non-Preferred / Specialty
+  deductible: number | 'medical'; // Rx deductible amount or 'medical' if medical deductible applies
+}
+
+export interface PremiumTier {
+  single: number;
+  couple: number;
+  employeeChild: number;
+  family: number;
 }
 
 export interface HealthPlan {
   id: string;
   year: number;
   name: string;
+  shortName: string;
   carrier: string;
   network: string;
+  networkType: 'Freedom' | 'Liberty' | 'Metro' | 'Open Access' | 'Open Access Plus';
 
-  // Premiums (weekly)
-  premiums: {
-    single: number;
-    employeeSpouse: number;
-    employeeChildren: number;
-    family: number;
-  };
+  // Premiums (weekly) - can have income tiers for Value plans
+  premiums: PremiumTier;
+  premiumsHighIncome?: PremiumTier; // For >$200k income tier
 
   // Core plan details
   deductible: CoverageLevel;
   oopMax: CoverageLevel;
-  coinsurance: number; // percentage after deductible (e.g., 30 for 30%)
+  coinsurance: number; // percentage plan pays (e.g., 80 means 80/20)
 
   // Copays
   copays: Copays;
   copaysBeforeDeductible: boolean;
+  copayNotes?: string;
 
   // RX
-  rxDeductibleApplies: boolean;
   rxTiers: RxTiers;
-  rxCoinsurance?: number;
+  rxNotes?: string;
 
   // Tax-advantaged accounts
   hsaEligible: boolean;
   hraAmount?: CoverageLevel;
 
-  // Specialty drug rules
-  specialtyAccumulatorProgram: boolean; // Does manufacturer assistance count?
+  // Network restrictions
+  networkNotes?: string;
 
   // Metadata
-  description?: string;
-  highlights?: string[];
+  description: string;
+  highlights: string[];
+  considerations?: string[];
   isActive: boolean;
 }
 
-export type EnrollmentType = 'single' | 'employeeSpouse' | 'employeeChildren' | 'family';
+export type EnrollmentType = 'single' | 'couple' | 'employeeChild' | 'family';
+
+export type IncomeTier = 'standard' | 'high';
 
 export interface UserScenario {
   enrollmentType: EnrollmentType;
+  incomeTier: IncomeTier;
 
   // Medical usage expectations
   pcpVisits: number;
@@ -150,16 +158,18 @@ export interface PlanComparison {
   scenario: UserScenario;
   plans: CostBreakdown[];
   lowestCostPlanId: string;
-  savings: number; // Difference between highest and lowest
+  savings: number;
 }
 
 export interface YearOverYearChange {
   field: string;
   displayName: string;
+  category: 'premium' | 'deductible' | 'copay' | 'rx' | 'network' | 'benefits';
   oldValue: string | number;
   newValue: string | number;
-  changeType: 'increase' | 'decrease' | 'same' | 'new' | 'removed';
+  changeType: 'increase' | 'decrease' | 'same' | 'new' | 'removed' | 'changed';
   percentChange?: number;
+  impact: 'positive' | 'negative' | 'neutral';
 }
 
 export interface PlanYearComparison {

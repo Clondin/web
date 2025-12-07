@@ -10,7 +10,11 @@ import {
   SparklesIcon,
   ArrowRightIcon,
   CheckCircleIcon,
+  ShieldCheckIcon,
+  CurrencyDollarIcon,
+  ChartBarIcon,
 } from '@heroicons/react/24/outline';
+import { StarIcon } from '@heroicons/react/24/solid';
 
 export default function Home() {
   const { plans, costBreakdowns } = usePlansStore();
@@ -28,234 +32,292 @@ export default function Home() {
   const features = [
     {
       title: 'Browse Plans',
-      description: 'Explore all 2025 and 2026 health plan options',
+      description: 'Explore all 2025 and 2026 health plan options with detailed benefits',
       icon: DocumentTextIcon,
       href: '/plans',
-      color: 'bg-blue-500',
+      gradient: 'from-blue-500 to-indigo-600',
+      iconBg: 'bg-blue-500',
     },
     {
       title: 'Model My Costs',
-      description: 'Adjust your personal variables and see estimated costs',
+      description: 'Customize your scenario and see real-time cost estimates',
       icon: CalculatorIcon,
       href: '/model',
-      color: 'bg-purple-500',
+      gradient: 'from-violet-500 to-purple-600',
+      iconBg: 'bg-violet-500',
     },
     {
       title: 'Compare Plans',
-      description: 'Side-by-side comparison of selected plans',
+      description: 'Side-by-side comparison of your selected plans',
       icon: ArrowsRightLeftIcon,
       href: '/compare',
-      color: 'bg-teal-500',
+      gradient: 'from-teal-500 to-emerald-600',
+      iconBg: 'bg-teal-500',
     },
     {
-      title: "What's New in 2026",
-      description: 'See year-over-year changes and new plan options',
+      title: "What's New",
+      description: 'See year-over-year changes and new 2026 options',
       icon: SparklesIcon,
       href: '/whats-new',
-      color: 'bg-orange-500',
+      gradient: 'from-amber-500 to-orange-600',
+      iconBg: 'bg-amber-500',
     },
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 md:p-12 text-white mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">
-          2025-2026 Health Plan Comparison Tool
-        </h1>
-        <p className="text-lg text-blue-100 mb-6 max-w-2xl">
-          Explore, model, and compare all company health plans. Make an informed
-          decision with real-time cost calculations based on your expected usage.
-        </p>
-        <div className="flex flex-wrap gap-4">
-          <Link
-            href="/model"
-            className="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-          >
-            Start Modeling
-            <ArrowRightIcon className="h-5 w-5 ml-2" />
-          </Link>
-          <Link
-            href="/plans"
-            className="inline-flex items-center px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-400 transition-colors"
-          >
-            Browse All Plans
-          </Link>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hero Section */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 rounded-3xl p-8 md:p-12 text-white mb-10">
+          {/* Background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }} />
+          </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">2025 Plans</p>
-          <p className="text-2xl font-bold text-gray-900">{plans2025.length}</p>
-        </div>
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">2026 Plans</p>
-          <p className="text-2xl font-bold text-gray-900">{plans2026.length}</p>
-        </div>
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">HSA Eligible</p>
-          <p className="text-2xl font-bold text-gray-900">
-            {plans.filter((p) => p.hsaEligible).length}
-          </p>
-        </div>
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">Best Value</p>
-          <p className="text-2xl font-bold text-green-600">
-            {lowestCostBreakdown
-              ? formatCurrency(lowestCostBreakdown.netAnnualCost)
-              : '-'}
-          </p>
-        </div>
-      </div>
-
-      {/* Feature Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {features.map((feature) => (
-          <Link
-            key={feature.title}
-            href={feature.href}
-            className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all group"
-          >
-            <div
-              className={`w-12 h-12 ${feature.color} rounded-lg flex items-center justify-center mb-4`}
-            >
-              <feature.icon className="h-6 w-6 text-white" />
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="px-3 py-1 bg-blue-500/30 text-blue-200 rounded-full text-sm font-medium border border-blue-400/30">
+                Open Enrollment 2026
+              </span>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-              {feature.title}
-            </h3>
-            <p className="text-sm text-gray-500">{feature.description}</p>
-          </Link>
-        ))}
-      </div>
-
-      {/* Recommended Plan */}
-      {lowestCostBreakdown && (
-        <div className="bg-green-50 rounded-xl p-6 border border-green-200 mb-8">
-          <div className="flex items-start space-x-4">
-            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-              <CheckCircleIcon className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-green-900 mb-1">
-                Recommended for Your Scenario
-              </h3>
-              <p className="text-green-800">
-                Based on your current settings,{' '}
-                <strong>{lowestCostBreakdown.planName}</strong> offers the lowest
-                estimated annual cost at{' '}
-                <strong>
-                  {formatCurrency(lowestCostBreakdown.netAnnualCost)}
-                </strong>
-                .
-              </p>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+              Health Plan<br />
+              <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                Comparison Tool
+              </span>
+            </h1>
+            <p className="text-lg text-blue-100 mb-8 max-w-2xl leading-relaxed">
+              Make an informed decision with personalized cost calculations based on your
+              expected healthcare usage. Compare 2025 and 2026 plans side by side.
+            </p>
+            <div className="flex flex-wrap gap-4">
               <Link
-                href={`/plans/${lowestCostBreakdown.planId}`}
-                className="inline-flex items-center text-green-700 font-medium mt-2 hover:text-green-800"
+                href="/model"
+                className="inline-flex items-center px-6 py-3.5 bg-white text-slate-900 rounded-xl font-semibold hover:bg-blue-50 transition-all shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 group"
               >
-                View plan details
-                <ArrowRightIcon className="h-4 w-4 ml-1" />
+                Start Modeling
+                <ArrowRightIcon className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                href="/plans"
+                className="inline-flex items-center px-6 py-3.5 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20"
+              >
+                Browse All Plans
               </Link>
             </div>
           </div>
         </div>
-      )}
 
-      {/* Year Overview */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* 2025 Plans */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-4 bg-gray-50 border-b border-gray-200">
-            <h3 className="font-semibold text-gray-900">2025 Plans (Current)</h3>
-            <p className="text-sm text-gray-500">Cigna Network</p>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
+                <DocumentTextIcon className="h-5 w-5 text-slate-600" />
+              </div>
+              <span className="text-sm font-medium text-slate-500">2025 Plans</span>
+            </div>
+            <p className="text-3xl font-bold text-slate-900">{plans2025.length}</p>
           </div>
-          <div className="p-4 space-y-3">
-            {plans2025.map((plan) => {
-              const breakdown = costBreakdowns.get(plan.id);
-              return (
-                <Link
-                  key={plan.id}
-                  href={`/plans/${plan.id}`}
-                  className="flex justify-between items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <div>
-                    <p className="font-medium text-gray-900">{plan.name}</p>
-                    <p className="text-sm text-gray-500">
-                      {formatCurrency(plan.deductible.single)} deductible
-                      {plan.hsaEligible && (
-                        <span className="ml-2 text-green-600">HSA</span>
-                      )}
-                    </p>
-                  </div>
-                  {breakdown && (
-                    <span className="text-sm font-medium text-gray-900">
-                      {formatCurrency(breakdown.netAnnualCost)}/yr
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                <SparklesIcon className="h-5 w-5 text-blue-600" />
+              </div>
+              <span className="text-sm font-medium text-slate-500">2026 Plans</span>
+            </div>
+            <p className="text-3xl font-bold text-slate-900">{plans2026.length}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <ShieldCheckIcon className="h-5 w-5 text-emerald-600" />
+              </div>
+              <span className="text-sm font-medium text-slate-500">HSA Eligible</span>
+            </div>
+            <p className="text-3xl font-bold text-slate-900">
+              {plans.filter((p) => p.hsaEligible).length}
+            </p>
+          </div>
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+                <CurrencyDollarIcon className="h-5 w-5 text-violet-600" />
+              </div>
+              <span className="text-sm font-medium text-slate-500">Best Value</span>
+            </div>
+            <p className="text-3xl font-bold text-emerald-600">
+              {lowestCostBreakdown
+                ? formatCurrency(lowestCostBreakdown.netAnnualCost)
+                : '-'}
+            </p>
           </div>
         </div>
 
-        {/* 2026 Plans */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-4 bg-blue-50 border-b border-blue-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-gray-900">2026 Plans (New)</h3>
-                <p className="text-sm text-gray-500">Oxford Network</p>
+        {/* Feature Cards */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {features.map((feature) => (
+            <Link
+              key={feature.title}
+              href={feature.href}
+              className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg hover:border-slate-300 transition-all duration-300 group"
+            >
+              <div
+                className={`w-14 h-14 ${feature.iconBg} rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg`}
+              >
+                <feature.icon className="h-7 w-7 text-white" />
               </div>
-              <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                New Options
-              </span>
+              <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+                {feature.title}
+              </h3>
+              <p className="text-sm text-slate-500 leading-relaxed">{feature.description}</p>
+            </Link>
+          ))}
+        </div>
+
+        {/* Recommended Plan */}
+        {lowestCostBreakdown && (
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-200 mb-10">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-500/30">
+                <StarIcon className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-lg text-emerald-900 mb-1">
+                  Recommended for Your Scenario
+                </h3>
+                <p className="text-emerald-700 leading-relaxed">
+                  Based on your current settings,{' '}
+                  <strong className="font-semibold">{lowestCostBreakdown.planName}</strong> offers the lowest
+                  estimated annual cost at{' '}
+                  <strong className="font-semibold text-emerald-600">
+                    {formatCurrency(lowestCostBreakdown.netAnnualCost)}
+                  </strong>
+                  .
+                </p>
+                <Link
+                  href={`/plans/${lowestCostBreakdown.planId}`}
+                  className="inline-flex items-center text-emerald-700 font-semibold mt-3 hover:text-emerald-800 group"
+                >
+                  View plan details
+                  <ArrowRightIcon className="h-4 w-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
             </div>
           </div>
-          <div className="p-4 space-y-3">
-            {plans2026.map((plan) => {
-              const breakdown = costBreakdowns.get(plan.id);
-              const isLowest =
-                lowestCostBreakdown?.planId === plan.id;
-              return (
-                <Link
-                  key={plan.id}
-                  href={`/plans/${plan.id}`}
-                  className={`flex justify-between items-center p-3 rounded-lg transition-colors ${
-                    isLowest
-                      ? 'bg-green-50 hover:bg-green-100'
-                      : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <p className="font-medium text-gray-900">{plan.name}</p>
-                      {isLowest && (
-                        <span className="px-1.5 py-0.5 bg-green-500 text-white text-xs rounded">
-                          Best
+        )}
+
+        {/* Year Overview */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* 2025 Plans */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="p-5 bg-slate-50 border-b border-slate-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-lg text-slate-900">2025 Plans</h3>
+                  <p className="text-sm text-slate-500">Cigna Network • Current</p>
+                </div>
+                <span className="px-3 py-1 bg-slate-200 text-slate-600 text-xs font-semibold rounded-full">
+                  {plans2025.length} plans
+                </span>
+              </div>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {plans2025.map((plan) => {
+                const breakdown = costBreakdowns.get(plan.id);
+                return (
+                  <Link
+                    key={plan.id}
+                    href={`/plans/${plan.id}`}
+                    className="flex justify-between items-center p-4 hover:bg-slate-50 transition-colors"
+                  >
+                    <div>
+                      <p className="font-semibold text-slate-900">{plan.name}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-sm text-slate-500">
+                          {formatCurrency(plan.deductible.single)} deductible
                         </span>
-                      )}
+                        {plan.hsaEligible && (
+                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">
+                            HSA
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-500">
-                      {formatCurrency(plan.deductible.single)} deductible
-                      {plan.hsaEligible && (
-                        <span className="ml-2 text-green-600">HSA</span>
-                      )}
-                    </p>
-                  </div>
-                  {breakdown && (
-                    <span
-                      className={`text-sm font-medium ${
-                        isLowest ? 'text-green-700' : 'text-gray-900'
-                      }`}
-                    >
-                      {formatCurrency(breakdown.netAnnualCost)}/yr
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+                    {breakdown && (
+                      <span className="text-sm font-bold text-slate-900 bg-slate-100 px-3 py-1.5 rounded-lg">
+                        {formatCurrency(breakdown.netAnnualCost)}/yr
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 2026 Plans */}
+          <div className="bg-white rounded-2xl shadow-sm border border-blue-200 overflow-hidden">
+            <div className="p-5 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-lg text-slate-900">2026 Plans</h3>
+                  <p className="text-sm text-blue-600">Oxford Network • New</p>
+                </div>
+                <span className="px-3 py-1 bg-blue-500 text-white text-xs font-semibold rounded-full">
+                  {plans2026.length} plans
+                </span>
+              </div>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {plans2026.map((plan) => {
+                const breakdown = costBreakdowns.get(plan.id);
+                const isLowest = lowestCostBreakdown?.planId === plan.id;
+                return (
+                  <Link
+                    key={plan.id}
+                    href={`/plans/${plan.id}`}
+                    className={`flex justify-between items-center p-4 transition-colors ${
+                      isLowest
+                        ? 'bg-emerald-50 hover:bg-emerald-100'
+                        : 'hover:bg-slate-50'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-slate-900">{plan.name}</p>
+                        {isLowest && (
+                          <span className="px-2 py-0.5 bg-emerald-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
+                            <StarIcon className="h-3 w-3" />
+                            Best
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-sm text-slate-500">
+                          {formatCurrency(plan.deductible.single)} deductible
+                        </span>
+                        {plan.hsaEligible && (
+                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">
+                            HSA
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {breakdown && (
+                      <span
+                        className={`text-sm font-bold px-3 py-1.5 rounded-lg ${
+                          isLowest ? 'text-emerald-700 bg-emerald-100' : 'text-slate-900 bg-slate-100'
+                        }`}
+                      >
+                        {formatCurrency(breakdown.netAnnualCost)}/yr
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { HealthPlan, CostBreakdown, UserScenario } from '@/types';
-import { formatCurrency, getEnrollmentLabel } from './utils';
+import { formatCurrency, formatCopay, getEnrollmentLabel } from './utils';
 
 export function exportComparisonToPDF(
   plans: HealthPlan[],
@@ -81,9 +81,9 @@ export function exportComparisonToPDF(
       ),
     ],
     ['Coinsurance', ...plans.map((p) => `${p.coinsurance}%`)],
-    ['PCP Copay', ...plans.map((p) => formatCurrency(p.copays.pcp))],
-    ['Specialist Copay', ...plans.map((p) => formatCurrency(p.copays.specialist))],
-    ['ER Copay', ...plans.map((p) => formatCurrency(p.copays.er))],
+    ['PCP Copay', ...plans.map((p) => formatCopay(p.copays.pcp))],
+    ['Specialist Copay', ...plans.map((p) => formatCopay(p.copays.specialist))],
+    ['ER Copay', ...plans.map((p) => formatCopay(p.copays.er))],
     ['HSA Eligible', ...plans.map((p) => (p.hsaEligible ? 'Yes' : 'No'))],
     [
       'HRA Amount',
@@ -239,15 +239,15 @@ export function exportPlanDetailToPDF(
     ['OOP Max (Single)', formatCurrency(plan.oopMax.single)],
     ['OOP Max (Family)', formatCurrency(plan.oopMax.family)],
     ['Coinsurance', `${plan.coinsurance}%`],
-    ['PCP Copay', formatCurrency(plan.copays.pcp)],
-    ['Specialist Copay', formatCurrency(plan.copays.specialist)],
-    ['Urgent Care Copay', formatCurrency(plan.copays.urgentCare)],
-    ['ER Copay', formatCurrency(plan.copays.er)],
-    ['Imaging Copay', formatCurrency(plan.copays.imaging)],
-    ['Labs Copay', formatCurrency(plan.copays.labs)],
-    ['Generic Rx', formatCurrency(plan.rxTiers.generic)],
-    ['Preferred Rx', formatCurrency(plan.rxTiers.preferred)],
-    ['Specialty Rx', formatCurrency(plan.rxTiers.specialty)],
+    ['PCP Copay', formatCopay(plan.copays.pcp)],
+    ['Specialist Copay', formatCopay(plan.copays.specialist)],
+    ['Urgent Care Copay', formatCopay(plan.copays.urgentCare)],
+    ['ER Copay', formatCopay(plan.copays.er)],
+    ['Imaging Copay', formatCopay(plan.copays.imaging)],
+    ['Labs Copay', formatCopay(plan.copays.labs)],
+    ['Tier 1 Rx (Generic)', formatCurrency(plan.rxTiers.tier1)],
+    ['Tier 2 Rx (Preferred)', formatCurrency(plan.rxTiers.tier2)],
+    ['Tier 3 Rx (Specialty)', formatCurrency(plan.rxTiers.tier3)],
     ['HSA Eligible', plan.hsaEligible ? 'Yes' : 'No'],
     [
       'HRA Amount',
