@@ -38,18 +38,15 @@ export default function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3 group">
               <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow">
-                  <span className="text-white font-bold text-xl">H</span>
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center">
-                  <span className="text-white text-[8px] font-bold">+</span>
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:shadow-amber-500/30 transition-shadow">
+                  <span className="text-white font-bold text-xl">K</span>
                 </div>
               </div>
               <div className="hidden sm:block">
                 <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                  HealthPlan
+                  Kayco
                 </span>
-                <span className="text-xl font-light text-slate-500 ml-1">Compare</span>
+                <span className="text-xl font-light text-slate-500 ml-1">Benefits</span>
               </div>
             </Link>
           </div>
@@ -65,11 +62,11 @@ export default function Header() {
                   href={item.href}
                   className={`flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700 shadow-sm'
+                      ? 'bg-amber-50 text-amber-700 shadow-sm'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  <item.icon className={`h-5 w-5 mr-2 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
+                  <item.icon className={`h-5 w-5 mr-2 ${isActive ? 'text-amber-600' : 'text-slate-400'}`} />
                   {item.name}
                 </Link>
               );
@@ -108,7 +105,7 @@ export default function Header() {
             ) : (
               <Link
                 href="/auth/login"
-                className="hidden md:flex items-center px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all"
+                className="hidden md:flex items-center px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all"
               >
                 Sign In
               </Link>
@@ -143,11 +140,11 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-colors ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700'
+                      ? 'bg-amber-50 text-amber-700'
                       : 'text-slate-600 hover:bg-slate-100'
                   }`}
                 >
-                  <item.icon className={`h-5 w-5 mr-3 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
+                  <item.icon className={`h-5 w-5 mr-3 ${isActive ? 'text-amber-600' : 'text-slate-400'}`} />
                   {item.name}
                 </Link>
               );
@@ -156,7 +153,7 @@ export default function Header() {
               <Link
                 href="/auth/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center px-4 py-3 mt-2 rounded-xl text-base font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
+                className="flex items-center justify-center px-4 py-3 mt-2 rounded-xl text-base font-semibold bg-gradient-to-r from-amber-500 to-orange-500 text-white"
               >
                 Sign In
               </Link>
