@@ -35,32 +35,32 @@ export default function Home() {
       description: 'Explore all 2025 and 2026 health plan options with detailed benefits',
       icon: DocumentTextIcon,
       href: '/plans',
-      gradient: 'from-blue-500 to-indigo-600',
-      iconBg: 'bg-blue-500',
+      gradient: 'from-slate-700 to-slate-900',
+      iconBg: 'bg-gradient-to-br from-slate-700 to-slate-900',
     },
     {
       title: 'Model My Costs',
       description: 'Customize your scenario and see real-time cost estimates',
       icon: CalculatorIcon,
       href: '/model',
-      gradient: 'from-violet-500 to-purple-600',
-      iconBg: 'bg-violet-500',
+      gradient: 'from-amber-500 to-orange-600',
+      iconBg: 'bg-gradient-to-br from-amber-500 to-orange-600',
     },
     {
       title: 'Compare Plans',
       description: 'Side-by-side comparison of your selected plans',
       icon: ArrowsRightLeftIcon,
       href: '/compare',
-      gradient: 'from-teal-500 to-emerald-600',
-      iconBg: 'bg-teal-500',
+      gradient: 'from-emerald-500 to-teal-600',
+      iconBg: 'bg-gradient-to-br from-emerald-500 to-teal-600',
     },
     {
       title: "What's New",
       description: 'See year-over-year changes and new 2026 options',
       icon: SparklesIcon,
       href: '/whats-new',
-      gradient: 'from-amber-500 to-orange-600',
-      iconBg: 'bg-amber-500',
+      gradient: 'from-violet-500 to-purple-600',
+      iconBg: 'bg-gradient-to-br from-violet-500 to-purple-600',
     },
   ];
 
@@ -68,41 +68,47 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 rounded-3xl p-8 md:p-12 text-white mb-10">
+        <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 md:p-12 text-white mb-10">
           {/* Background pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute inset-0" style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             }} />
           </div>
+          {/* Decorative gradient orbs */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-amber-500/20 to-orange-600/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-amber-400/10 to-orange-500/10 rounded-full blur-2xl"></div>
 
           <div className="relative">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="px-3 py-1 bg-blue-500/30 text-blue-200 rounded-full text-sm font-medium border border-blue-400/30">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                <span className="text-white font-bold text-xl">K</span>
+              </div>
+              <span className="px-4 py-1.5 bg-amber-500/20 text-amber-200 rounded-full text-sm font-semibold border border-amber-400/30">
                 Open Enrollment 2026
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-              Health Plan<br />
-              <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                Comparison Tool
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+              Kayco<br />
+              <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                Benefits Portal
               </span>
             </h1>
-            <p className="text-lg text-blue-100 mb-8 max-w-2xl leading-relaxed">
-              Make an informed decision with personalized cost calculations based on your
-              expected healthcare usage. Compare 2025 and 2026 plans side by side.
+            <p className="text-lg text-slate-300 mb-8 max-w-2xl leading-relaxed">
+              Your personalized benefits decision hub. Compare health plans, model costs
+              with your real scenarios, and find the perfect plan for you and your family.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/model"
-                className="inline-flex items-center px-6 py-3.5 bg-white text-slate-900 rounded-xl font-semibold hover:bg-blue-50 transition-all shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 group"
+                className="inline-flex items-center px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all shadow-lg shadow-amber-500/30 hover:shadow-xl hover:shadow-amber-500/40 group"
               >
-                Start Modeling
+                Start Cost Modeling
                 <ArrowRightIcon className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/plans"
-                className="inline-flex items-center px-6 py-3.5 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20"
+                className="inline-flex items-center px-6 py-3.5 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20 backdrop-blur-sm"
               >
                 Browse All Plans
               </Link>
@@ -123,8 +129,8 @@ export default function Home() {
           </div>
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                <SparklesIcon className="h-5 w-5 text-blue-600" />
+              <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                <SparklesIcon className="h-5 w-5 text-amber-600" />
               </div>
               <span className="text-sm font-medium text-slate-500">2026 Plans</span>
             </div>
@@ -169,7 +175,7 @@ export default function Home() {
               >
                 <feature.icon className="h-7 w-7 text-white" />
               </div>
-              <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+              <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-amber-600 transition-colors">
                 {feature.title}
               </h3>
               <p className="text-sm text-slate-500 leading-relaxed">{feature.description}</p>
@@ -258,14 +264,14 @@ export default function Home() {
           </div>
 
           {/* 2026 Plans */}
-          <div className="bg-white rounded-2xl shadow-sm border border-blue-200 overflow-hidden">
-            <div className="p-5 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200">
+          <div className="bg-white rounded-2xl shadow-sm border border-amber-200 overflow-hidden">
+            <div className="p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-bold text-lg text-slate-900">2026 Plans</h3>
-                  <p className="text-sm text-blue-600">Oxford Network • New</p>
+                  <p className="text-sm text-amber-600">Oxford Network • New</p>
                 </div>
-                <span className="px-3 py-1 bg-blue-500 text-white text-xs font-semibold rounded-full">
+                <span className="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold rounded-full">
                   {plans2026.length} plans
                 </span>
               </div>

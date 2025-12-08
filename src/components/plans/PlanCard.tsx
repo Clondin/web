@@ -59,7 +59,7 @@ export default function PlanCard({
     <div
       className={`bg-white rounded-2xl shadow-sm border-2 transition-all duration-300 hover:shadow-lg group ${
         isSelected
-          ? 'border-blue-500 ring-4 ring-blue-100'
+          ? 'border-amber-500 ring-4 ring-amber-100'
           : isLowestCost
           ? 'border-emerald-500 ring-4 ring-emerald-100'
           : 'border-slate-200 hover:border-slate-300'
@@ -73,7 +73,7 @@ export default function PlanCard({
               <span
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold border ${
                   plan.year === 2026
-                    ? 'bg-blue-50 text-blue-700 border-blue-200'
+                    ? 'bg-amber-50 text-amber-700 border-amber-200'
                     : 'bg-slate-100 text-slate-600 border-slate-200'
                 }`}
               >
@@ -95,7 +95,7 @@ export default function PlanCard({
                 </span>
               )}
             </div>
-            <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+            <h3 className="text-xl font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
               {plan.name}
             </h3>
             <p className="text-sm text-slate-500 mt-1">
@@ -108,8 +108,8 @@ export default function PlanCard({
               onClick={handleToggleSelect}
               className={`p-2 rounded-xl transition-all duration-200 ${
                 isSelected
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                  : 'bg-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-500'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/30'
+                  : 'bg-slate-100 text-slate-400 hover:bg-amber-50 hover:text-amber-500'
               }`}
               title={isSelected ? 'Remove from comparison' : 'Add to comparison'}
             >
@@ -168,15 +168,15 @@ export default function PlanCard({
 
       {/* Estimated Annual Cost */}
       {breakdown && (
-        <div className="mx-5 mb-4 p-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white">
+        <div className="mx-5 mb-4 p-4 bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-blue-100 uppercase tracking-wide">Est. Annual Cost</p>
-              <p className="text-2xl font-bold mt-0.5">{formatCurrency(breakdown.netAnnualCost)}</p>
+              <p className="text-xs font-medium text-slate-300 uppercase tracking-wide">Est. Annual Cost</p>
+              <p className="text-2xl font-bold mt-0.5 text-amber-400">{formatCurrency(breakdown.netAnnualCost)}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-blue-100">After tax savings</p>
-              <p className="text-xs text-blue-100">& HRA credit</p>
+              <p className="text-xs text-slate-400">After tax savings</p>
+              <p className="text-xs text-slate-400">& HRA credit</p>
             </div>
           </div>
         </div>
