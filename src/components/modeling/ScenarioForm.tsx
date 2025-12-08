@@ -97,8 +97,8 @@ function ToggleField({ label, checked, onChange, helpText }: ToggleFieldProps) {
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-          checked ? 'bg-blue-600' : 'bg-slate-300'
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
+          checked ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 'bg-slate-300'
         }`}
       >
         <span
@@ -147,7 +147,7 @@ function NumberInput({
           max={max}
           className={`w-full rounded-lg border border-slate-300 py-2.5 ${
             prefix ? 'pl-7' : 'pl-3'
-          } pr-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all bg-white`}
+          } pr-3 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all bg-white`}
         />
       </div>
       {helpText && (
@@ -211,11 +211,11 @@ export default function ScenarioForm() {
                   onClick={() => setScenario({ enrollmentType: type })}
                   className={`flex items-center gap-2 px-3 py-3 text-sm rounded-xl border-2 transition-all ${
                     scenario.enrollmentType === type
-                      ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-sm'
+                      ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-sm'
                       : 'border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
                   }`}
                 >
-                  <Icon className={`h-5 w-5 ${scenario.enrollmentType === type ? 'text-blue-600' : 'text-slate-400'}`} />
+                  <Icon className={`h-5 w-5 ${scenario.enrollmentType === type ? 'text-amber-600' : 'text-slate-400'}`} />
                   <span className="font-medium">{getEnrollmentLabel(type)}</span>
                 </button>
               );
